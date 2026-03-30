@@ -9,6 +9,8 @@ import {
   type CatAction,
 } from "./cat-sprites";
 
+export const ALL_ACTIONS: CatAction[] = ["idle", "walk", "run", "sleep", "lick", "meow"];
+
 export class CatGame {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -17,8 +19,8 @@ export class CatGame {
   // Cat position (free roam)
   private x: number = 0;
   private y: number = 0;
-  private dirX: number = 1;  // horizontal direction: 1 or -1
-  private dirY: number = 0;  // vertical component for diagonal movement
+  private dirX: number = 1;
+  private dirY: number = 0;
 
   // Animation state
   private action: CatAction = "idle";
@@ -34,6 +36,12 @@ export class CatGame {
   private screenWidth: number;
   private screenHeight: number;
 
+  // Pause state
+  private paused: boolean = false;
+
+  // Activity toggles (all enabled by default)
+  enabledActions: Set<CatAction> = new Set(ALL_ACTIONS);
+
   private animationId: number = 0;
 
   constructor(canvas: HTMLCanvasElement, catName: string, screenWidth: number, screenHeight: number) {
@@ -43,12 +51,15 @@ export class CatGame {
     this.screenWidth = screenWidth;
     this.screenHeight = screenHeight;
 
-    // Start at random position
     this.x = Math.random() * (screenWidth - SPRITE_WIDTH);
     this.y = Math.random() * (screenHeight - SPRITE_HEIGHT - 20);
 
     this.ctx.imageSmoothingEnabled = false;
   }
+
+  get catX() { return this.x; }
+  get catY() { return this.y; }
+  get isPaused() { return this.paused; }
 
   start() {
     this.pickRandomAction();
@@ -60,21 +71,53 @@ export class CatGame {
     if (this.animationId) cancelAnimationFrame(this.animationId);
   }
 
+  pause() {
+    this.paused = true;
+    this.action = "idle";
+    this.currentFrame = 0;
+  }
+
+  resume() {
+    this.paused = false;
+    this.pickRandomAction();
+  }
+
+  forceAction(action: CatAction) {
+    this.paused = false;
+    this.action = action;
+    this.currentFrame = 0;
+    if (action === "walk" || action === "run") {
+      const angle = Math.random() * Math.PI * 2;
+      this.dirX = Math.cos(angle);
+      this.dirY = Math.sin(angle);
+      this.facingLeft = this.dirX < 0;
+    }
+    const [min, max] = ACTION_DURATION[action];
+    this.actionEndTime = performance.now() + min + Math.random() * (max - min);
+  }
+
   private pickRandomAction() {
-    const actions: CatAction[] = ["idle", "walk", "run", "sleep", "lick", "meow"];
-    const weights = [20, 30, 15, 15, 10, 10];
+    const available = ALL_ACTIONS.filter(a => this.enabledActions.has(a));
+    if (available.length === 0) {
+      this.action = "sleep";
+      return;
+    }
+
+    const baseWeights: Record<CatAction, number> = {
+      idle: 20, walk: 30, run: 15, sleep: 15, lick: 10, meow: 10,
+    };
+    const weights = available.map(a => baseWeights[a]);
     const total = weights.reduce((a, b) => a + b, 0);
     let rand = Math.random() * total;
-    let chosen: CatAction = "idle";
-    for (let i = 0; i < actions.length; i++) {
+    let chosen = available[0];
+    for (let i = 0; i < available.length; i++) {
       rand -= weights[i];
-      if (rand <= 0) { chosen = actions[i]; break; }
+      if (rand <= 0) { chosen = available[i]; break; }
     }
 
     this.action = chosen;
     this.currentFrame = 0;
 
-    // Pick random direction for movement actions
     if (chosen === "walk" || chosen === "run") {
       const angle = Math.random() * Math.PI * 2;
       this.dirX = Math.cos(angle);
@@ -89,30 +132,31 @@ export class CatGame {
   private loop = (now: number) => {
     this.animationId = requestAnimationFrame(this.loop);
 
-    if (now >= this.actionEndTime) {
-      this.pickRandomAction();
+    if (!this.paused) {
+      if (now >= this.actionEndTime) {
+        this.pickRandomAction();
+      }
+
+      // Move cat freely in 2D
+      const speed = MOVE_SPEED[this.action];
+      if (speed > 0) {
+        this.x += this.dirX * speed;
+        this.y += this.dirY * speed;
+
+        if (this.x <= 0) { this.x = 0; this.dirX = Math.abs(this.dirX); this.facingLeft = false; }
+        if (this.x >= this.screenWidth - SPRITE_WIDTH) { this.x = this.screenWidth - SPRITE_WIDTH; this.dirX = -Math.abs(this.dirX); this.facingLeft = true; }
+        if (this.y <= 0) { this.y = 0; this.dirY = Math.abs(this.dirY); }
+        if (this.y >= this.screenHeight - SPRITE_HEIGHT - 20) { this.y = this.screenHeight - SPRITE_HEIGHT - 20; this.dirY = -Math.abs(this.dirY); }
+      }
     }
 
-    // Animate frames
+    // Animate frames (keep animating even when paused for idle anim)
     const frameDur = FRAME_DURATION[this.action];
     if (now - this.lastFrameTime >= frameDur) {
       const frames = ANIMATIONS[this.action];
       this.currentFrame = (this.currentFrame + 1) % frames.length;
       this.lastFrameTime = now;
       this.zzzPhase += 0.3;
-    }
-
-    // Move cat freely in 2D
-    const speed = MOVE_SPEED[this.action];
-    if (speed > 0) {
-      this.x += this.dirX * speed;
-      this.y += this.dirY * speed;
-
-      // Bounce off screen edges
-      if (this.x <= 0) { this.x = 0; this.dirX = Math.abs(this.dirX); this.facingLeft = false; }
-      if (this.x >= this.screenWidth - SPRITE_WIDTH) { this.x = this.screenWidth - SPRITE_WIDTH; this.dirX = -Math.abs(this.dirX); this.facingLeft = true; }
-      if (this.y <= 0) { this.y = 0; this.dirY = Math.abs(this.dirY); }
-      if (this.y >= this.screenHeight - SPRITE_HEIGHT - 20) { this.y = this.screenHeight - SPRITE_HEIGHT - 20; this.dirY = -Math.abs(this.dirY); }
     }
 
     this.render(now);
@@ -174,6 +218,11 @@ export class CatGame {
     this.ctx.fill();
     this.ctx.fillStyle = "#444";
     this.ctx.fillText(this.catName, nameX, this.y + SPRITE_HEIGHT + 14);
+  }
+
+  setPosition(x: number, y: number) {
+    this.x = Math.max(0, Math.min(x, this.screenWidth - SPRITE_WIDTH));
+    this.y = Math.max(0, Math.min(y, this.screenHeight - SPRITE_HEIGHT - 20));
   }
 
   updateScreenSize(w: number, h: number) {
