@@ -2,7 +2,7 @@
 
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { state } from "./state";
-import { SPRITE_WIDTH, SPRITE_HEIGHT } from "./cat-v1/cat-sprites";
+import { SPRITE_WIDTH, SPRITE_HEIGHT } from "./cat";
 import { showDragHandle, hideDragHandle } from "./drag";
 import { openSettings, closeSettings } from "./components/settings-dialog";
 

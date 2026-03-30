@@ -3,12 +3,39 @@ import { availableMonitors } from "@tauri-apps/api/window";
 import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
 import { listen } from "@tauri-apps/api/event";
 import { CatGame, type CatGender } from "./game";
+import { type CatAction } from "./cat";
 import { state } from "./state";
 import { showWelcomeScreen } from "./components/welcome-screen";
 import { toggleMenu, closeMenu } from "./menu";
 import { setupDrag } from "./drag";
-import { setupCatClickDetection } from "./cat-v1/cat-interaction";
+import { setupCatClickDetection } from "./cat";
 import "./styles.css";
+
+interface SavedSettings {
+  name: string;
+  gender: CatGender;
+  enabledActions: string[];
+}
+
+export function saveSettings() {
+  if (!state.game) return;
+  const settings: SavedSettings = {
+    name: state.game.name,
+    gender: state.game.catGender,
+    enabledActions: [...state.game.enabledActions],
+  };
+  localStorage.setItem("cat-settings", JSON.stringify(settings));
+}
+
+function loadSettings(): SavedSettings | null {
+  try {
+    const raw = localStorage.getItem("cat-settings");
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
 
 async function startGame(catName: string, gender: CatGender) {
   state.win = getCurrentWindow();
@@ -41,6 +68,13 @@ async function startGame(catName: string, gender: CatGender) {
   canvas.height = screenHeight;
 
   state.game = new CatGame(canvas, catName, gender, screenWidth, screenHeight);
+
+  // Restore saved activity toggles
+  const saved = loadSettings();
+  if (saved?.enabledActions) {
+    state.game.enabledActions = new Set(saved.enabledActions as CatAction[]);
+  }
+
   state.game.start();
 
   await listen("toggle-menu", () => toggleMenu());
@@ -56,5 +90,11 @@ async function startGame(catName: string, gender: CatGender) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  showWelcomeScreen((name, gender) => startGame(name, gender));
+  const saved = loadSettings();
+  if (saved?.name) {
+    // Skip welcome screen, use saved settings
+    startGame(saved.name, saved.gender || "male");
+  } else {
+    showWelcomeScreen((name, gender) => startGame(name, gender));
+  }
 });

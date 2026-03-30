@@ -2,7 +2,8 @@
 
 import { state } from "../state";
 import { ALL_ACTIONS, type CatGender } from "../game";
-import { type CatAction } from "../cat-v1/cat-sprites";
+import { type CatAction } from "../cat";
+import { saveSettings } from "../main";
 
 export function openSettings() {
   if (!state.game) return;
@@ -16,7 +17,7 @@ export function openSettings() {
     walk: "Walk",
     run: "Run",
     sleep: "Sleep",
-    lick: "Lick fur",
+    eat: "Eat",
     meow: "Meow",
     vocab: "Vocab",
   };
@@ -80,6 +81,7 @@ export function openSettings() {
     const name = nameInput.value.trim();
     if (name && state.game) {
       state.game.setName(name);
+      saveSettings();
     }
   });
 
@@ -90,6 +92,7 @@ export function openSettings() {
       radio.addEventListener("change", () => {
         if (state.game) {
           state.game.setGender(radio.value as CatGender);
+          saveSettings();
         }
       });
     });
@@ -105,6 +108,7 @@ export function openSettings() {
         } else {
           state.game!.enabledActions.delete(action);
         }
+        saveSettings();
       });
     });
 

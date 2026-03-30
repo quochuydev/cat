@@ -1,7 +1,7 @@
 // Welcome screen UI and preview animation
 
 import type { CatGender } from "../game";
-import { ANIMATIONS, renderFrame } from "../cat-v1/cat-sprites";
+import { ANIMATIONS, renderFrame } from "../cat";
 
 const CAT_NAMES = [
   "Milo",

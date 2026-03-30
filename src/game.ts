@@ -7,7 +7,7 @@ import {
   SPRITE_HEIGHT,
   renderFrame,
   type CatAction,
-} from "./cat-v1/cat-sprites";
+} from "./cat";
 import meowSound from "./assets/sounds/meow.wav";
 import enWords from "./assets/words/en.json";
 import viWords from "./assets/words/vi.json";
@@ -17,7 +17,7 @@ export const ALL_ACTIONS: CatAction[] = [
   "walk",
   "run",
   "sleep",
-  "lick",
+  "eat",
   "meow",
   "vocab",
 ];
@@ -160,7 +160,7 @@ export class CatGame {
       walk: 30,
       run: 15,
       sleep: 15,
-      lick: 10,
+      eat: 10,
       meow: 10,
       vocab: 15,
     };

@@ -1,4 +1,4 @@
-// Pixel art cat sprite renderer and animation config
+// Pixel art cat-v5 sprite renderer and animation config (orange pixel cat, side view, 28x20)
 
 import { ANIMATIONS } from "./sprite-data";
 
@@ -6,14 +6,18 @@ export { ANIMATIONS };
 
 const PALETTE: Record<number, string> = {
   0: "transparent",
-  1: "#2b2b2b",   // outline / dark
-  2: "#f4a83d",   // orange body
-  3: "#fcd89d",   // cream belly / face
-  4: "#f28b9e",   // pink (nose, inner ears, paws)
-  5: "#ffffff",   // white (eyes)
-  6: "#2b2b2b",   // pupils
-  7: "#d4822a",   // dark orange stripes
-  8: "#f4a83d",   // tail (same as body)
+  1: "#000000",   // black outline
+  2: "#ef6c00",   // dark orange
+  3: "#fb8c00",   // medium orange
+  4: "#ffa000",   // orange
+  5: "#ffdeb1",   // cream (belly/face)
+  6: "#482a00",   // dark brown
+  7: "#4e342e",   // brown
+  8: "#e84e40",   // red (mouth/tongue)
+  9: "#f69988",   // pink (inner ear/nose)
+  10: "#fbc02d",  // golden yellow
+  11: "#ffd700",  // gold
+  12: "#ffee58",  // light yellow
 };
 
 export type CatAction = "idle" | "walk" | "run" | "sleep" | "eat" | "meow" | "vocab";
@@ -21,11 +25,11 @@ export type CatAction = "idle" | "walk" | "run" | "sleep" | "eat" | "meow" | "vo
 // Animation speed per action (ms per frame)
 export const FRAME_DURATION: Record<CatAction, number> = {
   idle:  500,
-  walk:  200,
-  run:   120,
+  walk:  180,
+  run:   100,
   sleep: 800,
-  eat:  300,
-  meow:  250,
+  eat:  250,
+  meow:  200,
   vocab: 500,
 };
 
@@ -51,7 +55,7 @@ export const MOVE_SPEED: Record<CatAction, number> = {
   vocab: 0,
 };
 
-const PIXEL_SIZE = 4;
+const PIXEL_SIZE = 3;
 
 export function renderFrame(
   ctx: CanvasRenderingContext2D,
@@ -83,5 +87,5 @@ export function renderFrame(
   }
 }
 
-export const SPRITE_WIDTH = 16 * PIXEL_SIZE;  // 64px
-export const SPRITE_HEIGHT = 16 * PIXEL_SIZE; // 64px
+export const SPRITE_WIDTH = 28 * PIXEL_SIZE;   // 84px
+export const SPRITE_HEIGHT = 20 * PIXEL_SIZE;  // 60px
