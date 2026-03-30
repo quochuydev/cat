@@ -7,20 +7,30 @@ import { showDragHandle, hideDragHandle } from "./drag";
 import { openSettings, closeSettings } from "./components/settings-dialog";
 
 const MENU_BUTTONS = [
-  { id: "settings",  icon: "\u2699",          label: "Settings",   color: "#f4a83d" },
-  { id: "chatgpt",   icon: "\ud83e\udd16",    label: "ChatGPT",   color: "#10a37f" },
-  { id: "youtube",   icon: "\u25b6\ufe0f",    label: "YouTube",    color: "#ff0000" },
-  { id: "ytmusic",   icon: "\ud83c\udfb5",    label: "YT Music",  color: "#ff4e45" },
-  { id: "facebook",  icon: "\ud83d\udc64",    label: "Facebook",  color: "#1877f2" },
-  { id: "translate", icon: "\ud83c\udf10",    label: "Translate",  color: "#4285f4" },
-  { id: "vnexpress", icon: "\ud83d\udcf0",    label: "VnExpress",  color: "#b71c1c" },
+  { id: "settings", icon: "\u2699", label: "Settings", color: "#f4a83d" },
+  { id: "chatgpt", icon: "\ud83e\udd16", label: "ChatGPT", color: "#10a37f" },
+  { id: "youtube", icon: "\u25b6\ufe0f", label: "YouTube", color: "#ff0000" },
+  { id: "ytmusic", icon: "\ud83c\udfb5", label: "YT Music", color: "#ff4e45" },
+  { id: "facebook", icon: "\ud83d\udc64", label: "Facebook", color: "#1877f2" },
+  {
+    id: "translate",
+    icon: "\ud83c\udf10",
+    label: "Translate",
+    color: "#4285f4",
+  },
+  {
+    id: "vnexpress",
+    icon: "\ud83d\udcf0",
+    label: "VnExpress",
+    color: "#b71c1c",
+  },
 ];
 
 const URL_MAP: Record<string, string> = {
-  chatgpt:   "https://chatgpt.com",
-  youtube:   "https://www.youtube.com",
-  ytmusic:   "https://music.youtube.com",
-  facebook:  "https://www.facebook.com",
+  chatgpt: "https://chatgpt.com",
+  youtube: "https://www.youtube.com",
+  ytmusic: "https://music.youtube.com",
+  facebook: "https://www.facebook.com",
   translate: "https://translate.google.com",
   vnexpress: "https://vnexpress.net",
 };
@@ -99,7 +109,6 @@ export function updateMenuPositions() {
     el.style.left = `${centerX + radius * Math.cos(angle)}px`;
     el.style.top = `${centerY + radius * Math.sin(angle)}px`;
   });
-
 }
 
 function onClickOutside(e: MouseEvent) {
@@ -107,9 +116,14 @@ function onClickOutside(e: MouseEvent) {
   const menu = document.getElementById("radial-menu");
   const settings = document.getElementById("settings-dialog");
   const handle = document.getElementById("drag-handle");
-  if (menu && !menu.contains(e.target as Node) &&
-      settings && !settings.contains(e.target as Node) &&
-      handle && !handle.contains(e.target as Node)) {
+  if (
+    menu &&
+    !menu.contains(e.target as Node) &&
+    settings &&
+    !settings.contains(e.target as Node) &&
+    handle &&
+    !handle.contains(e.target as Node)
+  ) {
     closeMenu();
   }
 }
