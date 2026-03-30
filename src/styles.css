@@ -236,14 +236,14 @@ html, body {
 .radial-btn {
   position: absolute;
   transform: translate(-50%, -50%);
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 2px solid rgba(255,255,255,0.9);
+  background-color: white !important;
   cursor: pointer;
   pointer-events: auto;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   box-shadow: 0 3px 12px rgba(0,0,0,0.25);
@@ -261,17 +261,10 @@ html, body {
 }
 
 .radial-icon {
-  font-size: 18px;
-  line-height: 1;
-}
-
-.radial-label {
-  font-size: 7px;
-  font-weight: 700;
-  color: white;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-  margin-top: 1px;
-  white-space: nowrap;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  border-radius: 2px;
 }
 
 @keyframes radial-pop {

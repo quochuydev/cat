@@ -3,7 +3,19 @@
 import type { CatGender } from "../game";
 import { ANIMATIONS, renderFrame } from "../cat-sprites";
 
+const CAT_NAMES = [
+  "Milo", "Luna", "Simba", "Nala", "Oliver", "Cleo", "Leo", "Bella",
+  "Charlie", "Willow", "Max", "Coco", "Jasper", "Daisy", "Felix", "Loki",
+  "Oscar", "Pepper", "Ginger", "Shadow", "Mochi", "Biscuit", "Pumpkin",
+  "Whiskers", "Mittens", "Oreo", "Tofu", "Nacho", "Waffles", "Nugget",
+];
+
+function randomCatName(): string {
+  return CAT_NAMES[Math.floor(Math.random() * CAT_NAMES.length)];
+}
+
 export function showWelcomeScreen(onStart: (name: string, gender: CatGender) => void) {
+  const name = randomCatName();
   const app = document.getElementById("app")!;
   app.innerHTML = `
     <div class="welcome">
@@ -13,7 +25,7 @@ export function showWelcomeScreen(onStart: (name: string, gender: CatGender) => 
         </div>
         <h1>Name Your Cat</h1>
         <form id="name-form">
-          <input type="text" id="cat-name" placeholder="Enter cat name..." maxlength="16" autofocus required />
+          <input type="text" id="cat-name" placeholder="Enter cat name..." maxlength="16" autofocus required value="${name}" />
           <div class="gender-select">
             <label class="gender-option">
               <input type="radio" name="gender" value="male" checked />

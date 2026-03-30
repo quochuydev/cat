@@ -6,21 +6,54 @@ import { SPRITE_WIDTH, SPRITE_HEIGHT } from "./cat-sprites";
 import { showDragHandle, hideDragHandle } from "./drag";
 import { openSettings, closeSettings } from "./components/settings-dialog";
 
+import settingsLogo from "./assets/logos/settings.svg";
+import chatgptLogo from "./assets/logos/chatgpt.png";
+import youtubeLogo from "./assets/logos/youtube.png";
+import ytmusicLogo from "./assets/logos/ytmusic.png";
+import facebookLogo from "./assets/logos/facebook.png";
+import translateLogo from "./assets/logos/translate.png";
+import vnexpressLogo from "./assets/logos/vnexpress.png";
+
 const MENU_BUTTONS = [
-  { id: "settings", icon: "\u2699", label: "Settings", color: "#f4a83d" },
-  { id: "chatgpt", icon: "\ud83e\udd16", label: "ChatGPT", color: "#10a37f" },
-  { id: "youtube", icon: "\u25b6\ufe0f", label: "YouTube", color: "#ff0000" },
-  { id: "ytmusic", icon: "\ud83c\udfb5", label: "YT Music", color: "#ff4e45" },
-  { id: "facebook", icon: "\ud83d\udc64", label: "Facebook", color: "#1877f2" },
+  {
+    id: "settings",
+    icon: settingsLogo,
+    label: "Settings",
+    color: "#f4a83d",
+  },
+  {
+    id: "chatgpt",
+    icon: chatgptLogo,
+    label: "ChatGPT",
+    color: "#10a37f",
+  },
+  {
+    id: "youtube",
+    icon: youtubeLogo,
+    label: "YouTube",
+    color: "#ff0000",
+  },
+  {
+    id: "ytmusic",
+    icon: ytmusicLogo,
+    label: "YT Music",
+    color: "#ff4e45",
+  },
+  {
+    id: "facebook",
+    icon: facebookLogo,
+    label: "Facebook",
+    color: "#1877f2",
+  },
   {
     id: "translate",
-    icon: "\ud83c\udf10",
+    icon: translateLogo,
     label: "Translate",
     color: "#4285f4",
   },
   {
     id: "vnexpress",
-    icon: "\ud83d\udcf0",
+    icon: vnexpressLogo,
     label: "VnExpress",
     color: "#b71c1c",
   },
@@ -85,7 +118,7 @@ function renderMenuButtons() {
     el.style.top = `${by}px`;
     el.style.backgroundColor = btn.color;
     el.style.animationDelay = `${i * 40}ms`;
-    el.innerHTML = `<span class="radial-icon">${btn.icon}</span><span class="radial-label">${btn.label}</span>`;
+    el.innerHTML = `<img class="radial-icon" src="${btn.icon}" alt="${btn.label}" />`;
     el.addEventListener("click", (e) => {
       e.stopPropagation();
       handleMenuAction(btn.id);

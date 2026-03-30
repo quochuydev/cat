@@ -8,9 +8,12 @@ import {
   renderFrame,
   type CatAction,
 } from "./cat-sprites";
+import meowSound from "./assets/sounds/meow.wav";
 
 export const ALL_ACTIONS: CatAction[] = ["idle", "walk", "run", "sleep", "lick", "meow"];
 export type CatGender = "male" | "female" | "neutered";
+
+const meowAudio = new Audio(meowSound);
 
 export class CatGame {
   private canvas: HTMLCanvasElement;
@@ -94,6 +97,10 @@ export class CatGame {
     this.paused = false;
     this.action = action;
     this.currentFrame = 0;
+    if (action === "meow") {
+      meowAudio.currentTime = 0;
+      meowAudio.play().catch(() => {});
+    }
     if (action === "walk" || action === "run") {
       const angle = Math.random() * Math.PI * 2;
       this.dirX = Math.cos(angle);
@@ -125,6 +132,11 @@ export class CatGame {
 
     this.action = chosen;
     this.currentFrame = 0;
+
+    if (chosen === "meow") {
+      meowAudio.currentTime = 0;
+      meowAudio.play().catch(() => {});
+    }
 
     if (chosen === "walk" || chosen === "run") {
       const angle = Math.random() * Math.PI * 2;
