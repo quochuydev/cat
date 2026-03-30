@@ -1,20 +1,48 @@
 // Welcome screen UI and preview animation
 
 import type { CatGender } from "../game";
-import { ANIMATIONS, renderFrame } from "../cat-sprites";
+import { ANIMATIONS, renderFrame } from "../cat-v1/cat-sprites";
 
 const CAT_NAMES = [
-  "Milo", "Luna", "Simba", "Nala", "Oliver", "Cleo", "Leo", "Bella",
-  "Charlie", "Willow", "Max", "Coco", "Jasper", "Daisy", "Felix", "Loki",
-  "Oscar", "Pepper", "Ginger", "Shadow", "Mochi", "Biscuit", "Pumpkin",
-  "Whiskers", "Mittens", "Oreo", "Tofu", "Nacho", "Waffles", "Nugget",
+  "Milo",
+  "Luna",
+  "Simba",
+  "Nala",
+  "Oliver",
+  "Cleo",
+  "Leo",
+  "Bella",
+  "Charlie",
+  "Willow",
+  "Max",
+  "Coco",
+  "Jasper",
+  "Daisy",
+  "Felix",
+  "Loki",
+  "Oscar",
+  "Pepper",
+  "Ginger",
+  "Shadow",
+  "Mochi",
+  "Biscuit",
+  "Pumpkin",
+  "Whiskers",
+  "Mittens",
+  "Oreo",
+  "Tofu",
+  "Nacho",
+  "Waffles",
+  "Nugget",
 ];
 
 function randomCatName(): string {
   return CAT_NAMES[Math.floor(Math.random() * CAT_NAMES.length)];
 }
 
-export function showWelcomeScreen(onStart: (name: string, gender: CatGender) => void) {
+export function showWelcomeScreen(
+  onStart: (name: string, gender: CatGender) => void,
+) {
   const name = randomCatName();
   const app = document.getElementById("app")!;
   app.innerHTML = `
@@ -54,13 +82,17 @@ export function showWelcomeScreen(onStart: (name: string, gender: CatGender) => 
     const input = document.getElementById("cat-name") as HTMLInputElement;
     const name = input.value.trim();
     if (!name) return;
-    const gender = (document.querySelector<HTMLInputElement>('input[name="gender"]:checked')?.value || "male") as CatGender;
+    const gender = (document.querySelector<HTMLInputElement>(
+      'input[name="gender"]:checked',
+    )?.value || "male") as CatGender;
     onStart(name, gender);
   });
 }
 
 function animatePreview() {
-  const canvas = document.getElementById("preview-canvas") as HTMLCanvasElement | null;
+  const canvas = document.getElementById(
+    "preview-canvas",
+  ) as HTMLCanvasElement | null;
   if (!canvas) return;
   const ctx = canvas.getContext("2d")!;
   ctx.imageSmoothingEnabled = false;

@@ -7,12 +7,20 @@ import {
   SPRITE_HEIGHT,
   renderFrame,
   type CatAction,
-} from "./cat-sprites";
+} from "./cat-v1/cat-sprites";
 import meowSound from "./assets/sounds/meow.wav";
 import enWords from "./assets/words/en.json";
 import viWords from "./assets/words/vi.json";
 
-export const ALL_ACTIONS: CatAction[] = ["idle", "walk", "run", "sleep", "lick", "meow", "vocab"];
+export const ALL_ACTIONS: CatAction[] = [
+  "idle",
+  "walk",
+  "run",
+  "sleep",
+  "lick",
+  "meow",
+  "vocab",
+];
 export type CatGender = "male" | "female" | "neutered";
 
 const meowAudio = new Audio(meowSound);
@@ -55,7 +63,13 @@ export class CatGame {
 
   private animationId: number = 0;
 
-  constructor(canvas: HTMLCanvasElement, catName: string, gender: CatGender, screenWidth: number, screenHeight: number) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    catName: string,
+    gender: CatGender,
+    screenWidth: number,
+    screenHeight: number,
+  ) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
     this.catName = catName;
@@ -69,14 +83,28 @@ export class CatGame {
     this.ctx.imageSmoothingEnabled = false;
   }
 
-  get catX() { return this.x; }
-  get catY() { return this.y; }
-  get isPaused() { return this.paused; }
-  get name() { return this.catName; }
-  get catGender() { return this.gender; }
+  get catX() {
+    return this.x;
+  }
+  get catY() {
+    return this.y;
+  }
+  get isPaused() {
+    return this.paused;
+  }
+  get name() {
+    return this.catName;
+  }
+  get catGender() {
+    return this.gender;
+  }
 
-  setName(name: string) { this.catName = name; }
-  setGender(gender: CatGender) { this.gender = gender; }
+  setName(name: string) {
+    this.catName = name;
+  }
+  setGender(gender: CatGender) {
+    this.gender = gender;
+  }
 
   start() {
     this.pickRandomAction();
@@ -121,22 +149,31 @@ export class CatGame {
   }
 
   private pickRandomAction() {
-    const available = ALL_ACTIONS.filter(a => this.enabledActions.has(a));
+    const available = ALL_ACTIONS.filter((a) => this.enabledActions.has(a));
     if (available.length === 0) {
       this.action = "sleep";
       return;
     }
 
     const baseWeights: Record<CatAction, number> = {
-      idle: 20, walk: 30, run: 15, sleep: 15, lick: 10, meow: 10, vocab: 15,
+      idle: 20,
+      walk: 30,
+      run: 15,
+      sleep: 15,
+      lick: 10,
+      meow: 10,
+      vocab: 15,
     };
-    const weights = available.map(a => baseWeights[a]);
+    const weights = available.map((a) => baseWeights[a]);
     const total = weights.reduce((a, b) => a + b, 0);
     let rand = Math.random() * total;
     let chosen = available[0];
     for (let i = 0; i < available.length; i++) {
       rand -= weights[i];
-      if (rand <= 0) { chosen = available[i]; break; }
+      if (rand <= 0) {
+        chosen = available[i];
+        break;
+      }
     }
 
     this.action = chosen;
@@ -176,10 +213,24 @@ export class CatGame {
         this.x += this.dirX * speed;
         this.y += this.dirY * speed;
 
-        if (this.x <= 0) { this.x = 0; this.dirX = Math.abs(this.dirX); this.facingLeft = false; }
-        if (this.x >= this.screenWidth - SPRITE_WIDTH) { this.x = this.screenWidth - SPRITE_WIDTH; this.dirX = -Math.abs(this.dirX); this.facingLeft = true; }
-        if (this.y <= 0) { this.y = 0; this.dirY = Math.abs(this.dirY); }
-        if (this.y >= this.screenHeight - SPRITE_HEIGHT - 20) { this.y = this.screenHeight - SPRITE_HEIGHT - 20; this.dirY = -Math.abs(this.dirY); }
+        if (this.x <= 0) {
+          this.x = 0;
+          this.dirX = Math.abs(this.dirX);
+          this.facingLeft = false;
+        }
+        if (this.x >= this.screenWidth - SPRITE_WIDTH) {
+          this.x = this.screenWidth - SPRITE_WIDTH;
+          this.dirX = -Math.abs(this.dirX);
+          this.facingLeft = true;
+        }
+        if (this.y <= 0) {
+          this.y = 0;
+          this.dirY = Math.abs(this.dirY);
+        }
+        if (this.y >= this.screenHeight - SPRITE_HEIGHT - 20) {
+          this.y = this.screenHeight - SPRITE_HEIGHT - 20;
+          this.dirY = -Math.abs(this.dirY);
+        }
       }
     }
 
@@ -209,7 +260,9 @@ export class CatGame {
       this.y + SPRITE_HEIGHT - 2,
       SPRITE_WIDTH / 2.5,
       4,
-      0, 0, Math.PI * 2
+      0,
+      0,
+      Math.PI * 2,
     );
     this.ctx.fill();
 
@@ -223,7 +276,11 @@ export class CatGame {
       this.ctx.font = "bold 14px monospace";
       this.ctx.fillText("z", this.x + SPRITE_WIDTH + 2, this.y + 20 + zOff);
       this.ctx.font = "bold 18px monospace";
-      this.ctx.fillText("z", this.x + SPRITE_WIDTH + 10, this.y + 10 + zOff * 0.7);
+      this.ctx.fillText(
+        "z",
+        this.x + SPRITE_WIDTH + 10,
+        this.y + 10 + zOff * 0.7,
+      );
       this.ctx.font = "bold 22px monospace";
       this.ctx.fillText("Z", this.x + SPRITE_WIDTH + 20, this.y + zOff * 0.5);
     }
@@ -233,7 +290,11 @@ export class CatGame {
       const bounce = Math.sin(now * 0.01) * 2;
       this.ctx.font = "bold 13px monospace";
       this.ctx.fillStyle = "#ff6b9d";
-      this.ctx.fillText("meow~!", this.x + SPRITE_WIDTH / 2 - 20, this.y - 8 + bounce);
+      this.ctx.fillText(
+        "meow~!",
+        this.x + SPRITE_WIDTH / 2 - 20,
+        this.y - 8 + bounce,
+      );
     }
 
     // Vocab bubble
@@ -275,7 +336,12 @@ export class CatGame {
     }
 
     // Name tag with gender icon
-    const genderIcon = this.gender === "male" ? "\u2642" : this.gender === "female" ? "\u2640" : "\u26B2";
+    const genderIcon =
+      this.gender === "male"
+        ? "\u2642"
+        : this.gender === "female"
+          ? "\u2640"
+          : "\u26B2";
     const label = `${this.catName} ${genderIcon}`;
     this.ctx.font = "bold 11px monospace";
     const labelWidth = this.ctx.measureText(label).width;
@@ -291,9 +357,18 @@ export class CatGame {
     this.ctx.fill();
     this.ctx.fillStyle = "#444";
     this.ctx.fillText(this.catName, nameX, this.y + SPRITE_HEIGHT + 14);
-    const genderColor = this.gender === "male" ? "#4a90d9" : this.gender === "female" ? "#e75480" : "#888";
+    const genderColor =
+      this.gender === "male"
+        ? "#4a90d9"
+        : this.gender === "female"
+          ? "#e75480"
+          : "#888";
     this.ctx.fillStyle = genderColor;
-    this.ctx.fillText(` ${genderIcon}`, nameX + this.ctx.measureText(this.catName).width, this.y + SPRITE_HEIGHT + 14);
+    this.ctx.fillText(
+      ` ${genderIcon}`,
+      nameX + this.ctx.measureText(this.catName).width,
+      this.y + SPRITE_HEIGHT + 14,
+    );
   }
 
   setPosition(x: number, y: number) {

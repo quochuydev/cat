@@ -2,7 +2,7 @@
 
 import { state } from "../state";
 import { ALL_ACTIONS, type CatGender } from "../game";
-import { type CatAction } from "../cat-sprites";
+import { type CatAction } from "../cat-v1/cat-sprites";
 
 export function openSettings() {
   if (!state.game) return;
@@ -56,14 +56,16 @@ export function openSettings() {
       <div class="settings-section">
         <span class="settings-label">Activities</span>
         <div class="settings-list">
-          ${ALL_ACTIONS.map(action => `
+          ${ALL_ACTIONS.map(
+            (action) => `
             <label class="settings-toggle">
               <span>${actionLabels[action]}</span>
               <input type="checkbox" data-action="${action}"
                 ${state.game!.enabledActions.has(action) ? "checked" : ""} />
               <span class="toggle-slider"></span>
             </label>
-          `).join("")}
+          `,
+          ).join("")}
         </div>
         <p class="settings-hint">If all off, cat will sleep</p>
       </div>
@@ -82,25 +84,29 @@ export function openSettings() {
   });
 
   // Gender change
-  dialog.querySelectorAll<HTMLInputElement>('input[name="settings-gender"]').forEach(radio => {
-    radio.addEventListener("change", () => {
-      if (state.game) {
-        state.game.setGender(radio.value as CatGender);
-      }
+  dialog
+    .querySelectorAll<HTMLInputElement>('input[name="settings-gender"]')
+    .forEach((radio) => {
+      radio.addEventListener("change", () => {
+        if (state.game) {
+          state.game.setGender(radio.value as CatGender);
+        }
+      });
     });
-  });
 
   // Activity toggles
-  dialog.querySelectorAll<HTMLInputElement>("input[data-action]").forEach(input => {
-    input.addEventListener("change", () => {
-      const action = input.dataset.action as CatAction;
-      if (input.checked) {
-        state.game!.enabledActions.add(action);
-      } else {
-        state.game!.enabledActions.delete(action);
-      }
+  dialog
+    .querySelectorAll<HTMLInputElement>("input[data-action]")
+    .forEach((input) => {
+      input.addEventListener("change", () => {
+        const action = input.dataset.action as CatAction;
+        if (input.checked) {
+          state.game!.enabledActions.add(action);
+        } else {
+          state.game!.enabledActions.delete(action);
+        }
+      });
     });
-  });
 
   // Click backdrop to close
   dialog.querySelector(".settings-backdrop")!.addEventListener("click", () => {

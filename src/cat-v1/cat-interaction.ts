@@ -1,9 +1,9 @@
 // Cat click detection via cursor polling
 
 import { cursorPosition } from "@tauri-apps/api/window";
-import { state } from "./state";
+import { state } from "../state";
 import { SPRITE_WIDTH, SPRITE_HEIGHT } from "./cat-sprites";
-import { toggleMenu } from "./menu";
+import { toggleMenu } from "../menu";
 
 export function setupCatClickDetection() {
   const hitbox = document.getElementById("cat-hitbox")!;

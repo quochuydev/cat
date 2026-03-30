@@ -7,7 +7,7 @@ import { state } from "./state";
 import { showWelcomeScreen } from "./components/welcome-screen";
 import { toggleMenu, closeMenu } from "./menu";
 import { setupDrag } from "./drag";
-import { setupCatClickDetection } from "./cat-interaction";
+import { setupCatClickDetection } from "./cat-v1/cat-interaction";
 import "./styles.css";
 
 async function startGame(catName: string, gender: CatGender) {
