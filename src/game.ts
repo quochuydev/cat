@@ -10,11 +10,13 @@ import {
 } from "./cat-sprites";
 
 export const ALL_ACTIONS: CatAction[] = ["idle", "walk", "run", "sleep", "lick", "meow"];
+export type CatGender = "male" | "female" | "neutered";
 
 export class CatGame {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private catName: string;
+  private gender: CatGender;
 
   // Cat position (free roam)
   private x: number = 0;
@@ -44,10 +46,11 @@ export class CatGame {
 
   private animationId: number = 0;
 
-  constructor(canvas: HTMLCanvasElement, catName: string, screenWidth: number, screenHeight: number) {
+  constructor(canvas: HTMLCanvasElement, catName: string, gender: CatGender, screenWidth: number, screenHeight: number) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
     this.catName = catName;
+    this.gender = gender;
     this.screenWidth = screenWidth;
     this.screenHeight = screenHeight;
 
@@ -203,14 +206,16 @@ export class CatGame {
       this.ctx.fillText("meow~!", this.x + SPRITE_WIDTH / 2 - 20, this.y - 8 + bounce);
     }
 
-    // Name tag
+    // Name tag with gender icon
+    const genderIcon = this.gender === "male" ? "\u2642" : this.gender === "female" ? "\u2640" : "\u26B2";
+    const label = `${this.catName} ${genderIcon}`;
     this.ctx.font = "bold 11px monospace";
-    const nameWidth = this.ctx.measureText(this.catName).width;
-    const nameX = this.x + SPRITE_WIDTH / 2 - nameWidth / 2;
+    const labelWidth = this.ctx.measureText(label).width;
+    const nameX = this.x + SPRITE_WIDTH / 2 - labelWidth / 2;
     const pillPad = 4;
     const px = nameX - pillPad - 2;
     const py = this.y + SPRITE_HEIGHT + 2;
-    const pw = nameWidth + pillPad * 2 + 4;
+    const pw = labelWidth + pillPad * 2 + 4;
     const ph = 16;
     this.ctx.fillStyle = "rgba(255,255,255,0.85)";
     this.ctx.beginPath();
@@ -218,6 +223,9 @@ export class CatGame {
     this.ctx.fill();
     this.ctx.fillStyle = "#444";
     this.ctx.fillText(this.catName, nameX, this.y + SPRITE_HEIGHT + 14);
+    const genderColor = this.gender === "male" ? "#4a90d9" : this.gender === "female" ? "#e75480" : "#888";
+    this.ctx.fillStyle = genderColor;
+    this.ctx.fillText(` ${genderIcon}`, nameX + this.ctx.measureText(this.catName).width, this.y + SPRITE_HEIGHT + 14);
   }
 
   setPosition(x: number, y: number) {

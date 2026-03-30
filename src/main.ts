@@ -1,8 +1,8 @@
-import { getCurrentWindow } from "@tauri-apps/api/window";
+import { getCurrentWindow, cursorPosition } from "@tauri-apps/api/window";
 import { availableMonitors } from "@tauri-apps/api/window";
 import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
 import { listen } from "@tauri-apps/api/event";
-import { CatGame, ALL_ACTIONS } from "./game";
+import { CatGame, ALL_ACTIONS, type CatGender } from "./game";
 import { SPRITE_WIDTH, SPRITE_HEIGHT, type CatAction } from "./cat-sprites";
 import "./styles.css";
 
@@ -14,6 +14,8 @@ let dragging = false;
 let dragOffsetX = 0;
 let dragOffsetY = 0;
 let win: ReturnType<typeof getCurrentWindow> | null = null;
+let cursorOverCat = false;
+let scaleFactor = 1;
 
 // Menu button definitions
 const MENU_BUTTONS = [
@@ -37,9 +39,23 @@ function showWelcomeScreen() {
         <h1>Name Your Cat</h1>
         <form id="name-form">
           <input type="text" id="cat-name" placeholder="Enter cat name..." maxlength="16" autofocus required />
+          <div class="gender-select">
+            <label class="gender-option">
+              <input type="radio" name="gender" value="male" checked />
+              <span class="gender-chip male">\u2642 Male</span>
+            </label>
+            <label class="gender-option">
+              <input type="radio" name="gender" value="female" />
+              <span class="gender-chip female">\u2640 Female</span>
+            </label>
+            <label class="gender-option">
+              <input type="radio" name="gender" value="neutered" />
+              <span class="gender-chip neutered">\u26B2 Neutered</span>
+            </label>
+          </div>
           <button type="submit" id="start-btn">Start</button>
         </form>
-        <p class="hint">Press <kbd>Cmd+Shift+S</kbd> to open cat menu</p>
+        <p class="hint">Click the cat or press <kbd>Cmd+Shift+S</kbd> to open menu</p>
       </div>
     </div>
   `;
@@ -51,7 +67,8 @@ function showWelcomeScreen() {
     const input = document.getElementById("cat-name") as HTMLInputElement;
     const name = input.value.trim();
     if (!name) return;
-    await startGame(name);
+    const gender = (document.querySelector<HTMLInputElement>('input[name="gender"]:checked')?.value || "male") as CatGender;
+    await startGame(name, gender);
   });
 }
 
@@ -74,12 +91,12 @@ function animatePreview() {
 }
 
 // -- Game Mode --
-async function startGame(catName: string) {
+async function startGame(catName: string, gender: CatGender) {
   win = getCurrentWindow();
 
   const monitors = await availableMonitors();
   const monitor = monitors[0];
-  const scaleFactor = monitor?.scaleFactor || 1;
+  scaleFactor = monitor?.scaleFactor || 1;
   const screenWidth = monitor ? monitor.size.width / scaleFactor : 1440;
   const screenHeight = monitor ? monitor.size.height / scaleFactor : 900;
 
@@ -93,6 +110,7 @@ async function startGame(catName: string) {
   const app = document.getElementById("app")!;
   app.innerHTML = `
     <canvas id="game-canvas"></canvas>
+    <div id="cat-hitbox" class="cat-hitbox"></div>
     <div id="drag-handle" class="drag-handle hidden"></div>
     <div id="radial-menu" class="radial-menu hidden"></div>
     <div id="settings-dialog" class="settings-dialog hidden"></div>
@@ -103,14 +121,21 @@ async function startGame(catName: string) {
   canvas.width = screenWidth;
   canvas.height = screenHeight;
 
-  game = new CatGame(canvas, catName, screenWidth, screenHeight);
+  game = new CatGame(canvas, catName, gender, screenWidth, screenHeight);
   game.start();
 
   // Listen for toggle-menu from global shortcut
   await listen("toggle-menu", () => toggleMenu());
 
-  // Set up drag handlers
+  // Set up drag handlers, cat click detection, and keyboard shortcuts
   setupDrag();
+  setupCatClickDetection();
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && menuOpen) {
+      closeMenu();
+    }
+  });
 }
 
 // -- Drag --
@@ -142,6 +167,62 @@ function setupDrag() {
     const handle = document.getElementById("drag-handle");
     if (handle) handle.classList.remove("dragging");
   });
+}
+
+// -- Cat Click Detection (cursor polling) --
+function setupCatClickDetection() {
+  const hitbox = document.getElementById("cat-hitbox")!;
+
+  hitbox.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (!menuOpen) {
+      toggleMenu();
+    }
+  });
+
+  // Poll cursor position to toggle ignore-cursor-events
+  setInterval(async () => {
+    if (!game || !win || menuOpen) return;
+    try {
+      const pos = await cursorPosition();
+      // cursorPosition returns physical pixels, convert to logical
+      const cx = pos.x / scaleFactor;
+      const cy = pos.y / scaleFactor;
+      const padding = 10;
+      const overCat =
+        cx >= game.catX - padding &&
+        cx <= game.catX + SPRITE_WIDTH + padding &&
+        cy >= game.catY - padding &&
+        cy <= game.catY + SPRITE_HEIGHT + padding;
+
+      if (overCat && !cursorOverCat) {
+        cursorOverCat = true;
+        await win.setIgnoreCursorEvents(false);
+        updateCatHitbox();
+        hitbox.style.display = "block";
+      } else if (!overCat && cursorOverCat) {
+        cursorOverCat = false;
+        hitbox.style.display = "none";
+        await win.setIgnoreCursorEvents(true);
+      }
+
+      if (cursorOverCat) {
+        updateCatHitbox();
+      }
+    } catch (_) {
+      // ignore polling errors
+    }
+  }, 80);
+}
+
+function updateCatHitbox() {
+  if (!game) return;
+  const hitbox = document.getElementById("cat-hitbox");
+  if (!hitbox) return;
+  hitbox.style.left = `${game.catX - 5}px`;
+  hitbox.style.top = `${game.catY - 5}px`;
+  hitbox.style.width = `${SPRITE_WIDTH + 10}px`;
+  hitbox.style.height = `${SPRITE_HEIGHT + 10}px`;
 }
 
 function updateDragHandle() {
@@ -262,6 +343,7 @@ async function closeMenu() {
   menuOpen = false;
   settingsOpen = false;
   dragging = false;
+  cursorOverCat = false;
 
   document.removeEventListener("click", onClickOutside);
 
@@ -274,6 +356,9 @@ async function closeMenu() {
   settings.innerHTML = "";
 
   hideDragHandle();
+
+  const hitbox = document.getElementById("cat-hitbox");
+  if (hitbox) hitbox.style.display = "none";
 
   game.resume();
   await win.setIgnoreCursorEvents(true);

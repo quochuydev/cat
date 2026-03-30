@@ -31,7 +31,7 @@ html, body {
 
 .welcome-card {
   text-align: center;
-  padding: 32px 40px;
+  padding: 48px 40px 24px;
 }
 
 .welcome-cat-preview {
@@ -54,8 +54,9 @@ html, body {
 
 #name-form {
   display: flex;
-  gap: 10px;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
 #cat-name {
@@ -67,7 +68,8 @@ html, body {
   background: rgba(255,255,255,0.9);
   color: #5a3825;
   outline: none;
-  width: 180px;
+  width: 100%;
+  box-sizing: border-box;
   transition: border-color 0.2s;
 }
 
@@ -80,6 +82,7 @@ html, body {
 }
 
 #start-btn {
+  width: 100%;
   padding: 10px 24px;
   border: none;
   border-radius: 12px;
@@ -101,6 +104,52 @@ html, body {
 
 #start-btn:active {
   transform: translateY(0);
+}
+
+.gender-select {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.gender-option input[type="radio"] {
+  display: none;
+}
+
+.gender-chip {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.5);
+  color: #777;
+}
+
+.gender-chip.male { border-color: rgba(74, 144, 217, 0.3); }
+.gender-chip.female { border-color: rgba(231, 84, 128, 0.3); }
+.gender-chip.neutered { border-color: rgba(136, 136, 136, 0.3); }
+
+.gender-option input[type="radio"]:checked + .gender-chip.male {
+  background: #4a90d9;
+  color: white;
+  border-color: #4a90d9;
+}
+
+.gender-option input[type="radio"]:checked + .gender-chip.female {
+  background: #e75480;
+  color: white;
+  border-color: #e75480;
+}
+
+.gender-option input[type="radio"]:checked + .gender-chip.neutered {
+  background: #888;
+  color: white;
+  border-color: #888;
 }
 
 .hint {
@@ -127,6 +176,16 @@ html, body {
   display: block;
   background: transparent;
   image-rendering: pixelated;
+}
+
+/* ========== Cat Hitbox (click target) ========== */
+.cat-hitbox {
+  position: absolute;
+  display: none;
+  cursor: pointer;
+  z-index: 4;
+  pointer-events: auto;
+  border-radius: 8px;
 }
 
 /* ========== Drag Handle ========== */
