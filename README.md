@@ -15,3 +15,7 @@ Download the latest release for your platform:
 ## Demo
 
 <img src="docs/readme.png" alt="Cat" width="400" />
+
+## Security
+
+The source code is public, NO any personal information send to server or external.
