@@ -12,4 +12,6 @@ Download the latest release for your platform:
 | Linux (deb)           | [cat_0.1.0_amd64.deb](https://github.com/quochuydev/cat/releases/latest/download/cat_0.1.0_amd64.deb)           |
 | Linux (AppImage)      | [cat_0.1.0_amd64.AppImage](https://github.com/quochuydev/cat/releases/latest/download/cat_0.1.0_amd64.AppImage) |
 
-> All installers are built automatically via GitHub Actions on every release tag.
+## Demo
+
+<img src="docs/readme.png" alt="Cat" width="400" />
