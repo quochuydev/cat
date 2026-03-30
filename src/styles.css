@@ -1,0 +1,116 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  font-family: "SF Pro Rounded", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+}
+
+/* ========== Welcome Screen ========== */
+.welcome {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #ffecd2, #fcb69f);
+  border-radius: 12px;
+}
+
+.welcome-card {
+  text-align: center;
+  padding: 32px 40px;
+}
+
+.welcome-cat-preview {
+  margin-bottom: 16px;
+}
+
+.welcome-cat-preview canvas {
+  image-rendering: pixelated;
+  width: 96px;
+  height: 96px;
+}
+
+.welcome h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #5a3825;
+  margin-bottom: 20px;
+  letter-spacing: -0.5px;
+}
+
+#name-form {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+#cat-name {
+  padding: 10px 16px;
+  border: 2px solid #e8a87c;
+  border-radius: 12px;
+  font-size: 16px;
+  font-family: inherit;
+  background: rgba(255,255,255,0.9);
+  color: #5a3825;
+  outline: none;
+  width: 180px;
+  transition: border-color 0.2s;
+}
+
+#cat-name:focus {
+  border-color: #d4822a;
+}
+
+#cat-name::placeholder {
+  color: #c49a7a;
+}
+
+#start-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  background: #f4a83d;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(244, 168, 61, 0.4);
+}
+
+#start-btn:hover {
+  background: #e89a2e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(244, 168, 61, 0.5);
+}
+
+#start-btn:active {
+  transform: translateY(0);
+}
+
+/* ========== Game Mode: fully transparent ========== */
+.game-mode {
+  background: transparent !important;
+  pointer-events: none;
+}
+
+.game-mode canvas {
+  display: block;
+  background: transparent;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
