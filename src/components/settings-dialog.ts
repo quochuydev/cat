@@ -18,6 +18,7 @@ export function openSettings() {
     sleep: "Sleep",
     lick: "Lick fur",
     meow: "Meow",
+    vocab: "Vocab",
   };
 
   const currentGender = state.game.catGender;

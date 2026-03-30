@@ -256,4 +256,5 @@ export const ANIMATIONS: Record<string, number[][][]> = {
   sleep: [SLEEP_1, SLEEP_2, SLEEP_1, SLEEP_2],
   lick:  [LICK_1, LICK_2, LICK_3, LICK_2],
   meow:  [MEOW_1, MEOW_2, MEOW_1, MEOW_2],
+  vocab: [IDLE_1, IDLE_2, IDLE_1, IDLE_2],
 };

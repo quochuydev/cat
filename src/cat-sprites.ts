@@ -16,7 +16,7 @@ const PALETTE: Record<number, string> = {
   8: "#f4a83d",   // tail (same as body)
 };
 
-export type CatAction = "idle" | "walk" | "run" | "sleep" | "lick" | "meow";
+export type CatAction = "idle" | "walk" | "run" | "sleep" | "lick" | "meow" | "vocab";
 
 // Animation speed per action (ms per frame)
 export const FRAME_DURATION: Record<CatAction, number> = {
@@ -26,6 +26,7 @@ export const FRAME_DURATION: Record<CatAction, number> = {
   sleep: 800,
   lick:  300,
   meow:  250,
+  vocab: 500,
 };
 
 // How long each action lasts (ms) before picking a new random one
@@ -36,6 +37,7 @@ export const ACTION_DURATION: Record<CatAction, [number, number]> = {
   sleep: [5000, 10000],
   lick:  [3000, 6000],
   meow:  [1500, 3000],
+  vocab: [4000, 7000],
 };
 
 // Movement speed per action (pixels per frame at 60fps)
@@ -46,6 +48,7 @@ export const MOVE_SPEED: Record<CatAction, number> = {
   sleep: 0,
   lick:  0,
   meow:  0,
+  vocab: 0,
 };
 
 const PIXEL_SIZE = 4;

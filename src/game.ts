@@ -9,8 +9,10 @@ import {
   type CatAction,
 } from "./cat-sprites";
 import meowSound from "./assets/sounds/meow.wav";
+import enWords from "./assets/words/en.json";
+import viWords from "./assets/words/vi.json";
 
-export const ALL_ACTIONS: CatAction[] = ["idle", "walk", "run", "sleep", "lick", "meow"];
+export const ALL_ACTIONS: CatAction[] = ["idle", "walk", "run", "sleep", "lick", "meow", "vocab"];
 export type CatGender = "male" | "female" | "neutered";
 
 const meowAudio = new Audio(meowSound);
@@ -36,6 +38,10 @@ export class CatGame {
 
   // Zzz animation
   private zzzPhase: number = 0;
+
+  // Vocab bubble
+  private vocabEn: string = "";
+  private vocabVi: string = "";
 
   // Screen bounds
   private screenWidth: number;
@@ -101,6 +107,9 @@ export class CatGame {
       meowAudio.currentTime = 0;
       meowAudio.play().catch(() => {});
     }
+    if (action === "vocab") {
+      this.pickRandomWord();
+    }
     if (action === "walk" || action === "run") {
       const angle = Math.random() * Math.PI * 2;
       this.dirX = Math.cos(angle);
@@ -119,7 +128,7 @@ export class CatGame {
     }
 
     const baseWeights: Record<CatAction, number> = {
-      idle: 20, walk: 30, run: 15, sleep: 15, lick: 10, meow: 10,
+      idle: 20, walk: 30, run: 15, sleep: 15, lick: 10, meow: 10, vocab: 15,
     };
     const weights = available.map(a => baseWeights[a]);
     const total = weights.reduce((a, b) => a + b, 0);
@@ -136,6 +145,10 @@ export class CatGame {
     if (chosen === "meow") {
       meowAudio.currentTime = 0;
       meowAudio.play().catch(() => {});
+    }
+
+    if (chosen === "vocab") {
+      this.pickRandomWord();
     }
 
     if (chosen === "walk" || chosen === "run") {
@@ -223,6 +236,44 @@ export class CatGame {
       this.ctx.fillText("meow~!", this.x + SPRITE_WIDTH / 2 - 20, this.y - 8 + bounce);
     }
 
+    // Vocab bubble
+    if (this.action === "vocab" && this.vocabEn) {
+      const bounce = Math.sin(now * 0.003) * 1.5;
+      const text = `${this.vocabEn}: ${this.vocabVi}`;
+      this.ctx.font = "12px sans-serif";
+      const textWidth = this.ctx.measureText(text).width;
+
+      const padX = 8;
+      const padY = 5;
+      const bubbleW = textWidth + padX * 2;
+      const bubbleH = 14 + padY * 2;
+      const bx = this.x + SPRITE_WIDTH / 2;
+      const bubbleX = bx - bubbleW / 2;
+      const bubbleY = this.y - bubbleH - 8 + bounce;
+
+      // Bubble background
+      this.ctx.fillStyle = "rgba(255,255,255,0.95)";
+      this.ctx.beginPath();
+      this.ctx.roundRect(bubbleX, bubbleY, bubbleW, bubbleH, 8);
+      this.ctx.fill();
+      this.ctx.strokeStyle = "rgba(0,0,0,0.15)";
+      this.ctx.lineWidth = 1;
+      this.ctx.stroke();
+
+      // Tail triangle
+      this.ctx.fillStyle = "rgba(255,255,255,0.95)";
+      this.ctx.beginPath();
+      this.ctx.moveTo(bx - 5, bubbleY + bubbleH);
+      this.ctx.lineTo(bx, bubbleY + bubbleH + 5);
+      this.ctx.lineTo(bx + 5, bubbleY + bubbleH);
+      this.ctx.fill();
+
+      // Text
+      this.ctx.font = "12px sans-serif";
+      this.ctx.fillStyle = "#000";
+      this.ctx.fillText(text, bubbleX + padX, bubbleY + padY + 11);
+    }
+
     // Name tag with gender icon
     const genderIcon = this.gender === "male" ? "\u2642" : this.gender === "female" ? "\u2640" : "\u26B2";
     const label = `${this.catName} ${genderIcon}`;
@@ -253,5 +304,11 @@ export class CatGame {
   updateScreenSize(w: number, h: number) {
     this.screenWidth = w;
     this.screenHeight = h;
+  }
+
+  private pickRandomWord() {
+    const idx = Math.floor(Math.random() * enWords.length);
+    this.vocabEn = enWords[idx];
+    this.vocabVi = viWords[idx];
   }
 }
