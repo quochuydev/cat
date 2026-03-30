@@ -63,6 +63,11 @@ export class CatGame {
   get catX() { return this.x; }
   get catY() { return this.y; }
   get isPaused() { return this.paused; }
+  get name() { return this.catName; }
+  get catGender() { return this.gender; }
+
+  setName(name: string) { this.catName = name; }
+  setGender(gender: CatGender) { this.gender = gender; }
 
   start() {
     this.pickRandomAction();
