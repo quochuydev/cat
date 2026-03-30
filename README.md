@@ -1,6 +1,6 @@
 # Cat
 
-## Installation
+### Installation
 
 Download the latest release for your platform:
 
@@ -12,10 +12,10 @@ Download the latest release for your platform:
 | Linux (deb)           | [cat_0.1.0_amd64.deb](https://github.com/quochuydev/cat/releases/latest/download/cat_0.1.0_amd64.deb)           |
 | Linux (AppImage)      | [cat_0.1.0_amd64.AppImage](https://github.com/quochuydev/cat/releases/latest/download/cat_0.1.0_amd64.AppImage) |
 
-## Demo
+### Demo
 
 <img src="docs/readme.png" alt="Cat" width="400" />
 
-## Security
+### Security
 
 The source code is public, NO any personal information send to server or external.
