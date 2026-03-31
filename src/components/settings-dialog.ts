@@ -1,5 +1,6 @@
 // Settings dialog for cat name, gender, and activity toggles
 
+import { check } from "@tauri-apps/plugin-updater";
 import { state } from "../state";
 import { ALL_ACTIONS, type CatGender } from "../game";
 import { ANIMATIONS, renderFrame, type CatAction, type CatColor } from "../cat";
@@ -109,6 +110,7 @@ export function openSettings() {
       </div>
 
       <button class="settings-done">Done</button>
+      <button class="settings-update" id="check-update">Check for Updates</button>
     </div>
   `;
 
@@ -205,6 +207,31 @@ export function openSettings() {
 
   dialog.querySelector(".settings-done")!.addEventListener("click", () => {
     closeSettings();
+  });
+
+  // Check for updates
+  const updateBtn = dialog.querySelector<HTMLButtonElement>("#check-update")!;
+  updateBtn.addEventListener("click", async () => {
+    updateBtn.disabled = true;
+    updateBtn.textContent = "Checking...";
+    try {
+      const update = await check();
+      if (update) {
+        updateBtn.textContent = `Updating to v${update.version}...`;
+        await update.downloadAndInstall((e) => {
+          if (e.event === "Started" && e.data.contentLength) {
+            updateBtn.textContent = `Downloading...`;
+          }
+        });
+        updateBtn.textContent = "Restart to apply";
+      } else {
+        updateBtn.textContent = "Up to date!";
+        setTimeout(() => { updateBtn.textContent = "Check for Updates"; updateBtn.disabled = false; }, 2000);
+      }
+    } catch {
+      updateBtn.textContent = "Update failed";
+      setTimeout(() => { updateBtn.textContent = "Check for Updates"; updateBtn.disabled = false; }, 2000);
+    }
   });
 }
 

@@ -30,7 +30,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDMyRjU3QjJBOTUxNzNGMUUKUldRZVB4ZVZLbnYxTWtzWE1mdUdvQTRpMityVzJaZ2h6YWlicEVrMVQ4Ym1TU1NFTjAxMnN3MHAK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDUxMkZDM0YyQzM3RENGN0MKUldSOHozM0Q4c012VVZ1ZnpySC9Obit5bHRRbnVrWUhoWGdKSmxGbzVjNVc0MU5HRGtTTXJaVmoK",
       "endpoints": [
         "https://github.com/quochuydev/cat/releases/latest/download/latest.json"
       ]

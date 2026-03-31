@@ -20,6 +20,7 @@
     "core:window:allow-current-monitor",
     "core:window:allow-set-focus",
     "core:window:allow-center",
-    "core:window:allow-cursor-position"
+    "core:window:allow-cursor-position",
+    "updater:default"
   ]
 }
