@@ -3,6 +3,7 @@ use std::thread;
 use serde::Serialize;
 use tauri::{Emitter, Manager};
 use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
+use tauri_plugin_updater::UpdaterExt;
 use tiny_http::{Header, Response, Server};
 
 #[derive(Clone, Serialize)]
@@ -123,6 +124,7 @@ pub fn run() {
                 })
                 .build(),
         )
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
@@ -132,6 +134,20 @@ pub fn run() {
 
             // Start local message server on port 11451
             start_message_server(app.handle().clone());
+
+            // Check for updates in background
+            let handle = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                match handle.updater().unwrap().check().await {
+                    Ok(Some(update)) => {
+                        let _ = update.download_and_install(|_, _| {}, || {}).await;
+                    }
+                    Ok(None) => {}
+                    Err(e) => {
+                        eprintln!("Failed to check for updates: {}", e);
+                    }
+                }
+            });
 
             Ok(())
         })
