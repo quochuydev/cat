@@ -2,17 +2,15 @@
 
 ### Installation
 
-Download the latest release for your platform:
-
 Download the latest release for your platform from the [Releases page](https://github.com/quochuydev/cat/releases/latest).
 
-| Platform              | File pattern              | Note                                                                |
-| --------------------- | ------------------------- | ------------------------------------------------------------------- |
-| macOS (Apple Silicon) | `Cat_x.x.x_aarch64.dmg`  | Run `xattr -cr /Applications/Cat.app && open /Applications/Cat.app` |
-| macOS (Intel)         | `Cat_x.x.x_x64.dmg`      | Run `xattr -cr /Applications/Cat.app && open /Applications/Cat.app` |
-| Windows               | `Cat_x.x.x_x64-setup.exe`| Click **More info** → **Run anyway**                                |
-| Linux (deb)           | `cat_x.x.x_amd64.deb`    |                                                                     |
-| Linux (AppImage)      | `cat_x.x.x_amd64.AppImage`| Run `chmod +x` before opening                                      |
+| Platform              | File pattern               | Note                                                                |
+| --------------------- | -------------------------- | ------------------------------------------------------------------- |
+| macOS (Apple Silicon) | `Cat_x.x.x_aarch64.dmg`    | Run `xattr -cr /Applications/Cat.app && open /Applications/Cat.app` |
+| macOS (Intel)         | `Cat_x.x.x_x64.dmg`        | Run `xattr -cr /Applications/Cat.app && open /Applications/Cat.app` |
+| Windows               | `Cat_x.x.x_x64-setup.exe`  | Click **More info** → **Run anyway**                                |
+| Linux (deb)           | `cat_x.x.x_amd64.deb`      |                                                                     |
+| Linux (AppImage)      | `cat_x.x.x_amd64.AppImage` | Run `chmod +x` before opening                                       |
 
 ### UI
 
@@ -25,7 +23,7 @@ Download the latest release for your platform from the [Releases page](https://g
 Send a message to your cat from the terminal:
 
 ```bash
-curl -X POST http://localhost:11451/say -d '{"message": "Hello from CLI!"}'
+curl -X POST http://localhost:11451/say -d 'Hello from CLI'
 ```
 
 ### Security
