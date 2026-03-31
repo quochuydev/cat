@@ -1,7 +1,11 @@
 // Drag handling for the cat
 
 import { state } from "./state";
+import { SPRITE_WIDTH, SPRITE_HEIGHT } from "./cat";
 import { updateMenuPositions } from "./menu";
+
+const HANDLE_WIDTH = 80;
+const HANDLE_HEIGHT = 80;
 
 export function setupDrag() {
   const handle = document.getElementById("drag-handle")!;
@@ -37,16 +41,16 @@ export function updateDragHandle() {
   if (!state.game) return;
   const handle = document.getElementById("drag-handle");
   if (!handle || handle.classList.contains("hidden")) return;
-  handle.style.left = `${state.game.catX - 8}px`;
-  handle.style.top = `${state.game.catY - 8}px`;
+  handle.style.left = `${state.game.catX + SPRITE_WIDTH / 2 - HANDLE_WIDTH / 2}px`;
+  handle.style.top = `${state.game.catY + SPRITE_HEIGHT / 2 - HANDLE_HEIGHT / 2}px`;
 }
 
 export function showDragHandle() {
   if (!state.game) return;
   const handle = document.getElementById("drag-handle")!;
   handle.classList.remove("hidden");
-  handle.style.left = `${state.game.catX - 8}px`;
-  handle.style.top = `${state.game.catY - 8}px`;
+  handle.style.left = `${state.game.catX + SPRITE_WIDTH / 2 - HANDLE_WIDTH / 2}px`;
+  handle.style.top = `${state.game.catY + SPRITE_HEIGHT / 2 - HANDLE_HEIGHT / 2}px`;
 }
 
 export function hideDragHandle() {

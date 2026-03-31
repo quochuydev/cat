@@ -22,6 +22,7 @@ pub fn run() {
             let window = app.get_webview_window("main").unwrap();
             let transparent = tauri::utils::config::Color(0, 0, 0, 0);
             let _ = window.set_background_color(Some(transparent));
+            let _ = window.set_shadow(false);
             Ok(())
         })
         .run(tauri::generate_context!())
