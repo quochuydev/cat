@@ -9,7 +9,7 @@ import { getPomodoroSettings, savePomodoroSettings } from "./main";
 
 import settingsLogo from "./assets/logos/settings.svg";
 import chatgptLogo from "./assets/logos/chatgpt.png";
-import youtubeLogo from "./assets/logos/youtube.png";
+import feedLogo from "./assets/logos/feed.svg";
 import ytmusicLogo from "./assets/logos/ytmusic.png";
 import facebookLogo from "./assets/logos/facebook.png";
 import translateLogo from "./assets/logos/translate.png";
@@ -36,16 +36,16 @@ const MENU_BUTTONS = [
     color: "#10a37f",
   },
   {
-    id: "youtube",
-    icon: youtubeLogo,
-    label: "YouTube",
-    color: "#ff0000",
-  },
-  {
     id: "ytmusic",
     icon: ytmusicLogo,
     label: "YT Music",
     color: "#ff4e45",
+  },
+  {
+    id: "feed",
+    icon: feedLogo,
+    label: "Feed",
+    color: "#f4a83d",
   },
   {
     id: "facebook",
@@ -69,7 +69,6 @@ const MENU_BUTTONS = [
 
 const URL_MAP: Record<string, string> = {
   chatgpt: "https://chatgpt.com",
-  youtube: "https://www.youtube.com",
   ytmusic: "https://music.youtube.com",
   facebook: "https://www.facebook.com",
   translate: "https://translate.google.com",
@@ -199,6 +198,12 @@ async function handleMenuAction(id: string) {
   if (!state.game) return;
   if (id === "settings") {
     openSettings();
+    return;
+  }
+  if (id === "feed") {
+    closeMenu();
+    state.game.forceAction("eat");
+    state.game.showChat("nom nom~! 🐟");
     return;
   }
   if (id === "pomodoro") {

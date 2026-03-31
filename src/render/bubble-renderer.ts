@@ -67,7 +67,7 @@ export function renderChatBubble(
   const textWidths = lines.map((l) => ctx.measureText(l).width);
   const bubbleW = Math.max(...textWidths) + padX * 2;
   const bubbleH = lines.length * lineHeight + padY * 2;
-  const bx = x + SPRITE_WIDTH / 2;
+  const bx = x + SPRITE_WIDTH / 2 + 15;
   const bubbleX = bx - bubbleW / 2;
   const bubbleY = y - bubbleH - 10 + bounce;
 
@@ -101,48 +101,4 @@ export function renderChatBubble(
   });
 
   ctx.globalAlpha = 1;
-}
-
-export function renderVocabBubble(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  now: number,
-  vocabEn: string,
-  vocabVi: string,
-) {
-  const bounce = Math.sin(now * 0.003) * 1.5;
-  const text = `${vocabEn}: ${vocabVi}`;
-  ctx.font = "12px sans-serif";
-  const textWidth = ctx.measureText(text).width;
-
-  const padX = 8;
-  const padY = 5;
-  const bubbleW = textWidth + padX * 2;
-  const bubbleH = 14 + padY * 2;
-  const bx = x + SPRITE_WIDTH / 2;
-  const bubbleX = bx - bubbleW / 2;
-  const bubbleY = y - bubbleH - 8 + bounce;
-
-  // Bubble background
-  ctx.fillStyle = "rgba(255,255,255,0.95)";
-  ctx.beginPath();
-  ctx.roundRect(bubbleX, bubbleY, bubbleW, bubbleH, 8);
-  ctx.fill();
-  ctx.strokeStyle = "rgba(0,0,0,0.15)";
-  ctx.lineWidth = 1;
-  ctx.stroke();
-
-  // Tail triangle
-  ctx.fillStyle = "rgba(255,255,255,0.95)";
-  ctx.beginPath();
-  ctx.moveTo(bx - 5, bubbleY + bubbleH);
-  ctx.lineTo(bx, bubbleY + bubbleH + 5);
-  ctx.lineTo(bx + 5, bubbleY + bubbleH);
-  ctx.fill();
-
-  // Text
-  ctx.font = "12px sans-serif";
-  ctx.fillStyle = "#000";
-  ctx.fillText(text, bubbleX + padX, bubbleY + padY + 11);
 }

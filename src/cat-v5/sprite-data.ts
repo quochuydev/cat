@@ -600,11 +600,11 @@ const EAT_12: number[][] = [
 ];
 
 export const ANIMATIONS: Record<string, number[][][]> = {
-  idle:  [IDLE_1, IDLE_2, IDLE_1, IDLE_2],
+  idle:  [EAT_1, EAT_2, EAT_3, EAT_4, EAT_5, EAT_6, EAT_7, EAT_8, EAT_9, EAT_10, EAT_11, EAT_12],
   walk:  [WALK_1, WALK_2, WALK_3, WALK_4, WALK_5, WALK_6],
   run:   [WALK_1, WALK_2, WALK_3, WALK_4, WALK_5, WALK_6],
   sleep: [SLEEP_1, SLEEP_2, SLEEP_3, SLEEP_4, SLEEP_5, SLEEP_6],
-  eat:   [EAT_1, EAT_2, EAT_3, EAT_4, EAT_5, EAT_6, EAT_7, EAT_8, EAT_9, EAT_10, EAT_11, EAT_12],
+  eat:   [IDLE_1, IDLE_2, IDLE_1, IDLE_2],
   meow:  [IDLE_1, IDLE_2, IDLE_1, IDLE_2],
   vocab: [IDLE_1, IDLE_2, IDLE_1, IDLE_2],
 };

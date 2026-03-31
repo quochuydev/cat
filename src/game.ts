@@ -14,7 +14,6 @@ import {
   renderSleepZzz,
   renderMeowBubble,
   renderChatBubble,
-  renderVocabBubble,
 } from "./render/bubble-renderer";
 import { renderPomodoroBadge } from "./render/pomodoro-renderer";
 import { listen } from "@tauri-apps/api/event";
@@ -57,10 +56,6 @@ export class CatGame {
 
   // Zzz animation
   private zzzPhase: number = 0;
-
-  // Vocab bubble
-  private vocabEn: string = "";
-  private vocabVi: string = "";
 
   // Screen bounds
   private screenWidth: number;
@@ -172,7 +167,7 @@ export class CatGame {
       meowAudio.play().catch(() => {});
     }
     if (action === "vocab") {
-      this.pickRandomWord();
+      this.showRandomWord();
     }
     if (action === "walk" || action === "run") {
       const angle = Math.random() * Math.PI * 2;
@@ -221,7 +216,7 @@ export class CatGame {
     }
 
     if (chosen === "vocab") {
-      this.pickRandomWord();
+      this.showRandomWord();
     }
 
     if (chosen === "walk" || chosen === "run") {
@@ -305,10 +300,6 @@ export class CatGame {
       renderChatBubble(this.ctx, this.x, this.y, now, this.chatMessage, this.chatExpireTime);
     }
 
-    if (this.action === "vocab" && this.vocabEn) {
-      renderVocabBubble(this.ctx, this.x, this.y, now, this.vocabEn, this.vocabVi);
-    }
-
     renderNameTag(this.ctx, this.x, this.y, this.catName, this.gender);
 
     if (this.pomodoroTimer?.isActive) {
@@ -346,9 +337,8 @@ export class CatGame {
     this.screenHeight = h;
   }
 
-  private pickRandomWord() {
+  private showRandomWord() {
     const idx = Math.floor(Math.random() * enWords.length);
-    this.vocabEn = enWords[idx];
-    this.vocabVi = viWords[idx];
+    this.showChat(`${enWords[idx]}: ${viWords[idx]}`);
   }
 }
