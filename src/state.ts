@@ -12,4 +12,5 @@ export const state = {
   win: null as ReturnType<typeof import("@tauri-apps/api/window").getCurrentWindow> | null,
   cursorOverCat: false,
   scaleFactor: 1,
+  pomodoroActive: false,
 };

@@ -4,6 +4,7 @@ import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
 import { listen } from "@tauri-apps/api/event";
 import { CatGame, type CatGender } from "./game";
 import { type CatAction, type CatColor } from "./cat";
+import { DEFAULT_POMODORO_SETTINGS, type PomodoroSettings } from "./pomodoro";
 import { state } from "./state";
 import { showWelcomeScreen } from "./components/welcome-screen";
 import { toggleMenu, closeMenu } from "./menu";
@@ -16,6 +17,7 @@ interface SavedSettings {
   gender: CatGender;
   color: CatColor;
   enabledActions: string[];
+  pomodoro?: PomodoroSettings;
 }
 
 export function saveSettings() {
@@ -27,6 +29,24 @@ export function saveSettings() {
     enabledActions: [...state.game.enabledActions],
   };
   localStorage.setItem("cat-settings", JSON.stringify(settings));
+}
+
+export function getPomodoroSettings(): PomodoroSettings {
+  const saved = loadSettings();
+  return { ...DEFAULT_POMODORO_SETTINGS, ...saved?.pomodoro };
+}
+
+export function savePomodoroSettings(partial: Partial<PomodoroSettings>) {
+  const current = getPomodoroSettings();
+  const updated = { ...current, ...partial };
+  const raw = localStorage.getItem("cat-settings");
+  const settings = raw ? JSON.parse(raw) : {};
+  settings.pomodoro = updated;
+  localStorage.setItem("cat-settings", JSON.stringify(settings));
+  // Apply to active timer
+  if (state.game?.pomodoroTimer) {
+    Object.assign(state.game.pomodoroTimer.settings, updated);
+  }
 }
 
 function loadSettings(): SavedSettings | null {
@@ -78,6 +98,13 @@ async function startGame(catName: string, gender: CatGender, color: CatColor = "
   }
 
   state.game.start();
+
+  // Restore pomodoro if it was enabled
+  const pomoSettings = getPomodoroSettings();
+  if (pomoSettings.enabled) {
+    state.game.togglePomodoro(pomoSettings);
+    state.pomodoroActive = true;
+  }
 
   await listen("toggle-menu", () => toggleMenu());
 

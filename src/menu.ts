@@ -5,6 +5,7 @@ import { state } from "./state";
 import { SPRITE_WIDTH, SPRITE_HEIGHT } from "./cat";
 import { showDragHandle, hideDragHandle } from "./drag";
 import { openSettings, closeSettings } from "./components/settings-dialog";
+import { getPomodoroSettings, savePomodoroSettings } from "./main";
 
 import settingsLogo from "./assets/logos/settings.svg";
 import chatgptLogo from "./assets/logos/chatgpt.png";
@@ -13,6 +14,7 @@ import ytmusicLogo from "./assets/logos/ytmusic.png";
 import facebookLogo from "./assets/logos/facebook.png";
 import translateLogo from "./assets/logos/translate.png";
 import vnexpressLogo from "./assets/logos/vnexpress.png";
+import pomodoroLogo from "./assets/logos/pomodoro.svg";
 
 const MENU_BUTTONS = [
   {
@@ -20,6 +22,12 @@ const MENU_BUTTONS = [
     icon: settingsLogo,
     label: "Settings",
     color: "#f4a83d",
+  },
+  {
+    id: "pomodoro",
+    icon: pomodoroLogo,
+    label: "Focus",
+    color: "#e74c3c",
   },
   {
     id: "chatgpt",
@@ -191,6 +199,13 @@ async function handleMenuAction(id: string) {
   if (!state.game) return;
   if (id === "settings") {
     openSettings();
+    return;
+  }
+  if (id === "pomodoro") {
+    state.game.togglePomodoro(getPomodoroSettings());
+    state.pomodoroActive = state.game.pomodoroTimer?.isActive ?? false;
+    savePomodoroSettings({ enabled: state.pomodoroActive });
+    closeMenu();
     return;
   }
   const url = URL_MAP[id];

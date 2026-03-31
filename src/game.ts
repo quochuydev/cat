@@ -9,6 +9,7 @@ import {
   type CatAction,
   type CatColor,
 } from "./cat";
+import { PomodoroTimer, type PomodoroSettings } from "./pomodoro";
 import meowSound from "./assets/sounds/meow.wav";
 import enWords from "./assets/words/en.json";
 import viWords from "./assets/words/vi.json";
@@ -62,6 +63,10 @@ export class CatGame {
 
   // Activity toggles (all enabled by default)
   enabledActions: Set<CatAction> = new Set(ALL_ACTIONS);
+
+  // Pomodoro
+  pomodoroTimer: PomodoroTimer | null = null;
+  private lastTickTime: number = 0;
 
   private animationId: number = 0;
 
@@ -159,7 +164,7 @@ export class CatGame {
   }
 
   private pickRandomAction() {
-    const available = ALL_ACTIONS.filter((a) => this.enabledActions.has(a));
+    let available = ALL_ACTIONS.filter((a) => this.enabledActions.has(a));
     if (available.length === 0) {
       this.action = "sleep";
       return;
@@ -211,6 +216,12 @@ export class CatGame {
 
   private loop = (now: number) => {
     this.animationId = requestAnimationFrame(this.loop);
+
+    // Tick Pomodoro timer
+    if (this.pomodoroTimer?.isActive && this.lastTickTime > 0) {
+      this.pomodoroTimer.tick(now - this.lastTickTime);
+    }
+    this.lastTickTime = now;
 
     if (!this.paused) {
       if (now >= this.actionEndTime) {
@@ -379,6 +390,64 @@ export class CatGame {
       nameX + this.ctx.measureText(this.catName).width,
       this.y + SPRITE_HEIGHT + 14,
     );
+
+    // Pomodoro pill badge (below name tag)
+    if (this.pomodoroTimer?.isActive) {
+      const isWork = this.pomodoroTimer.phase === "work";
+      const pillText = this.pomodoroTimer.getTimeString();
+      const pillColor = isWork ? "#f4a83d" : "#10a37f";
+
+      this.ctx.font = "bold 10px monospace";
+      const pillTextW = this.ctx.measureText(pillText).width;
+      const pillPadX = 8;
+      const pillH = 18;
+      const pillW = pillTextW + pillPadX * 2;
+      const pillX = this.x + SPRITE_WIDTH / 2 - pillW / 2;
+      const pillY = this.y + SPRITE_HEIGHT + 20;
+
+      // Progress bar background
+      this.ctx.fillStyle = "rgba(255,255,255,0.9)";
+      this.ctx.beginPath();
+      this.ctx.roundRect(pillX, pillY, pillW, pillH, 9);
+      this.ctx.fill();
+      this.ctx.strokeStyle = pillColor;
+      this.ctx.lineWidth = 1.5;
+      this.ctx.stroke();
+
+      // Progress fill
+      const progress = this.pomodoroTimer.getProgress();
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.roundRect(pillX, pillY, pillW, pillH, 9);
+      this.ctx.clip();
+      this.ctx.fillStyle = isWork ? "rgba(244,168,61,0.15)" : "rgba(16,163,127,0.15)";
+      this.ctx.fillRect(pillX, pillY, pillW * progress, pillH);
+      this.ctx.restore();
+
+      // Text
+      this.ctx.fillStyle = pillColor;
+      this.ctx.fillText(pillText, pillX + pillPadX, pillY + 13);
+    }
+  }
+
+  togglePomodoro(settings?: PomodoroSettings) {
+    if (this.pomodoroTimer?.isActive) {
+      this.pomodoroTimer.stop();
+      this.pomodoroTimer = null;
+      this.pickRandomAction();
+    } else {
+      this.pomodoroTimer = new PomodoroTimer(settings);
+      this.pomodoroTimer.onPhaseChange = (phase) => {
+        if (phase === "break") {
+          if (this.pomodoroTimer?.settings.soundEnabled !== false) {
+            meowAudio.currentTime = 0;
+            meowAudio.play().catch(() => {});
+          }
+        }
+      };
+      this.pomodoroTimer.start();
+      this.pickRandomAction();
+    }
   }
 
   setPosition(x: number, y: number) {

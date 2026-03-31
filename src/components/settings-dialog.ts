@@ -3,7 +3,7 @@
 import { state } from "../state";
 import { ALL_ACTIONS, type CatGender } from "../game";
 import { ANIMATIONS, renderFrame, type CatAction, type CatColor } from "../cat";
-import { saveSettings } from "../main";
+import { saveSettings, getPomodoroSettings, savePomodoroSettings } from "../main";
 
 export function openSettings() {
   if (!state.game) return;
@@ -24,67 +24,88 @@ export function openSettings() {
 
   const currentGender = state.game.catGender;
   const currentColor = state.game.catColor;
+  const pomoSettings = getPomodoroSettings();
 
   dialog.innerHTML = `
     <div class="settings-backdrop"></div>
     <div class="settings-card">
       <h3>Cat Settings</h3>
 
-      <div class="settings-section">
-        <label class="settings-field">
-          <span>Name</span>
-          <input type="text" id="settings-name" value="${state.game.name}" maxlength="16" />
-        </label>
-      </div>
-
-      <div class="settings-section">
-        <span class="settings-label">Gender</span>
-        <div class="gender-select">
-          <label class="gender-option">
-            <input type="radio" name="settings-gender" value="male" ${currentGender === "male" ? "checked" : ""} />
-            <span class="gender-chip male">\u2642 Male</span>
-          </label>
-          <label class="gender-option">
-            <input type="radio" name="settings-gender" value="female" ${currentGender === "female" ? "checked" : ""} />
-            <span class="gender-chip female">\u2640 Female</span>
-          </label>
-          <label class="gender-option">
-            <input type="radio" name="settings-gender" value="neutered" ${currentGender === "neutered" ? "checked" : ""} />
-            <span class="gender-chip neutered">\u26B2 Neutered</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="settings-section">
-        <span class="settings-label">Color</span>
-        <div class="color-select">
-          ${(["orange", "white", "black"] as CatColor[]).map((color) => `
-            <label class="color-option">
-              <input type="radio" name="settings-color" value="${color}" ${currentColor === color ? "checked" : ""} />
-              <span class="color-chip">
-                <canvas class="color-preview" data-color="${color}" width="84" height="84"></canvas>
-                <span class="color-name">${color.charAt(0).toUpperCase() + color.slice(1)}</span>
-              </span>
+      <div class="settings-grid">
+        <div class="settings-col">
+          <div class="settings-section">
+            <label class="settings-field">
+              <span>Name</span>
+              <input type="text" id="settings-name" value="${state.game.name}" maxlength="16" />
             </label>
-          `).join("")}
-        </div>
-      </div>
+          </div>
 
-      <div class="settings-section">
-        <span class="settings-label">Activities</span>
-        <div class="settings-list">
-          ${ALL_ACTIONS.map(
-            (action) => `
+          <div class="settings-section">
+            <span class="settings-label">Gender</span>
+            <div class="gender-select">
+              <label class="gender-option">
+                <input type="radio" name="settings-gender" value="male" ${currentGender === "male" ? "checked" : ""} />
+                <span class="gender-chip male">\u2642 Male</span>
+              </label>
+              <label class="gender-option">
+                <input type="radio" name="settings-gender" value="female" ${currentGender === "female" ? "checked" : ""} />
+                <span class="gender-chip female">\u2640 Female</span>
+              </label>
+              <label class="gender-option">
+                <input type="radio" name="settings-gender" value="neutered" ${currentGender === "neutered" ? "checked" : ""} />
+                <span class="gender-chip neutered">\u26B2 Neutered</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <span class="settings-label">Color</span>
+            <div class="color-select">
+              ${(["orange", "white", "black"] as CatColor[]).map((color) => `
+                <label class="color-option">
+                  <input type="radio" name="settings-color" value="${color}" ${currentColor === color ? "checked" : ""} />
+                  <span class="color-chip">
+                    <canvas class="color-preview" data-color="${color}" width="84" height="84"></canvas>
+                    <span class="color-name">${color.charAt(0).toUpperCase() + color.slice(1)}</span>
+                  </span>
+                </label>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-col">
+          <div class="settings-section">
+            <span class="settings-label">Activities</span>
+            <div class="settings-list">
+              ${ALL_ACTIONS.map(
+                (action) => `
+                <label class="settings-toggle">
+                  <span>${actionLabels[action]}</span>
+                  <input type="checkbox" data-action="${action}"
+                    ${state.game!.enabledActions.has(action) ? "checked" : ""} />
+                  <span class="toggle-slider"></span>
+                </label>
+              `,
+              ).join("")}
+            </div>
+            <p class="settings-hint">If all off, cat will sleep</p>
+          </div>
+
+          <div class="settings-section">
+            <span class="settings-label">Focus Timer</span>
             <label class="settings-toggle">
-              <span>${actionLabels[action]}</span>
-              <input type="checkbox" data-action="${action}"
-                ${state.game!.enabledActions.has(action) ? "checked" : ""} />
+              <span>Pomodoro (25/5)</span>
+              <input type="checkbox" id="pomo-enabled" ${pomoSettings.enabled ? "checked" : ""} />
               <span class="toggle-slider"></span>
             </label>
-          `,
-          ).join("")}
+            <label class="settings-toggle">
+              <span>Sound</span>
+              <input type="checkbox" id="pomo-sound" ${pomoSettings.soundEnabled ? "checked" : ""} />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
         </div>
-        <p class="settings-hint">If all off, cat will sleep</p>
       </div>
 
       <button class="settings-done">Done</button>
@@ -148,6 +169,34 @@ export function openSettings() {
         saveSettings();
       });
     });
+
+  // Pomodoro toggle
+  const pomoToggle = dialog.querySelector<HTMLInputElement>("#pomo-enabled");
+  if (pomoToggle) {
+    pomoToggle.addEventListener("change", () => {
+      if (!state.game) return;
+      savePomodoroSettings({ enabled: pomoToggle.checked });
+      if (pomoToggle.checked) {
+        if (!state.game.pomodoroTimer?.isActive) {
+          state.game.togglePomodoro(getPomodoroSettings());
+          state.pomodoroActive = true;
+        }
+      } else {
+        if (state.game.pomodoroTimer?.isActive) {
+          state.game.togglePomodoro();
+          state.pomodoroActive = false;
+        }
+      }
+    });
+  }
+
+  // Sound toggle
+  const soundToggle = dialog.querySelector<HTMLInputElement>("#pomo-sound");
+  if (soundToggle) {
+    soundToggle.addEventListener("change", () => {
+      savePomodoroSettings({ soundEnabled: soundToggle.checked });
+    });
+  }
 
   // Click backdrop to close
   dialog.querySelector(".settings-backdrop")!.addEventListener("click", () => {
