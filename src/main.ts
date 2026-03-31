@@ -3,7 +3,7 @@ import { availableMonitors } from "@tauri-apps/api/window";
 import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
 import { listen } from "@tauri-apps/api/event";
 import { CatGame, type CatGender } from "./game";
-import { type CatAction } from "./cat";
+import { type CatAction, type CatColor } from "./cat";
 import { state } from "./state";
 import { showWelcomeScreen } from "./components/welcome-screen";
 import { toggleMenu, closeMenu } from "./menu";
@@ -14,6 +14,7 @@ import "./styles.css";
 interface SavedSettings {
   name: string;
   gender: CatGender;
+  color: CatColor;
   enabledActions: string[];
 }
 
@@ -22,6 +23,7 @@ export function saveSettings() {
   const settings: SavedSettings = {
     name: state.game.name,
     gender: state.game.catGender,
+    color: state.game.catColor,
     enabledActions: [...state.game.enabledActions],
   };
   localStorage.setItem("cat-settings", JSON.stringify(settings));
@@ -37,7 +39,7 @@ function loadSettings(): SavedSettings | null {
   }
 }
 
-async function startGame(catName: string, gender: CatGender) {
+async function startGame(catName: string, gender: CatGender, color: CatColor = "orange") {
   state.win = getCurrentWindow();
 
   const monitors = await availableMonitors();
@@ -67,7 +69,7 @@ async function startGame(catName: string, gender: CatGender) {
   canvas.width = screenWidth;
   canvas.height = screenHeight;
 
-  state.game = new CatGame(canvas, catName, gender, screenWidth, screenHeight);
+  state.game = new CatGame(canvas, catName, gender, screenWidth, screenHeight, color);
 
   // Restore saved activity toggles
   const saved = loadSettings();
@@ -93,8 +95,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const saved = loadSettings();
   if (saved?.name) {
     // Skip welcome screen, use saved settings
-    startGame(saved.name, saved.gender || "male");
+    startGame(saved.name, saved.gender || "male", saved.color || "orange");
   } else {
-    showWelcomeScreen((name, gender) => startGame(name, gender));
+    showWelcomeScreen((name, gender, color) => startGame(name, gender, color));
   }
 });

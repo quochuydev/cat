@@ -2,7 +2,7 @@
 
 import { state } from "../state";
 import { ALL_ACTIONS, type CatGender } from "../game";
-import { type CatAction } from "../cat";
+import { ANIMATIONS, renderFrame, type CatAction, type CatColor } from "../cat";
 import { saveSettings } from "../main";
 
 export function openSettings() {
@@ -23,6 +23,7 @@ export function openSettings() {
   };
 
   const currentGender = state.game.catGender;
+  const currentColor = state.game.catColor;
 
   dialog.innerHTML = `
     <div class="settings-backdrop"></div>
@@ -51,6 +52,21 @@ export function openSettings() {
             <input type="radio" name="settings-gender" value="neutered" ${currentGender === "neutered" ? "checked" : ""} />
             <span class="gender-chip neutered">\u26B2 Neutered</span>
           </label>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <span class="settings-label">Color</span>
+        <div class="color-select">
+          ${(["orange", "white", "black"] as CatColor[]).map((color) => `
+            <label class="color-option">
+              <input type="radio" name="settings-color" value="${color}" ${currentColor === color ? "checked" : ""} />
+              <span class="color-chip">
+                <canvas class="color-preview" data-color="${color}" width="84" height="84"></canvas>
+                <span class="color-name">${color.charAt(0).toUpperCase() + color.slice(1)}</span>
+              </span>
+            </label>
+          `).join("")}
         </div>
       </div>
 
@@ -92,6 +108,27 @@ export function openSettings() {
       radio.addEventListener("change", () => {
         if (state.game) {
           state.game.setGender(radio.value as CatGender);
+          saveSettings();
+        }
+      });
+    });
+
+  // Color previews
+  dialog.querySelectorAll<HTMLCanvasElement>(".color-preview").forEach((canvas) => {
+    const color = canvas.dataset.color as CatColor;
+    const ctx = canvas.getContext("2d")!;
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, 84, 84);
+    renderFrame(ctx, ANIMATIONS.idle[0], 0, 12, false, color);
+  });
+
+  // Color change
+  dialog
+    .querySelectorAll<HTMLInputElement>('input[name="settings-color"]')
+    .forEach((radio) => {
+      radio.addEventListener("change", () => {
+        if (state.game) {
+          state.game.setColor(radio.value as CatColor);
           saveSettings();
         }
       });

@@ -1,7 +1,7 @@
 // Welcome screen UI and preview animation
 
 import type { CatGender } from "../game";
-import { ANIMATIONS, renderFrame } from "../cat";
+import { ANIMATIONS, renderFrame, type CatColor } from "../cat";
 
 const CAT_NAMES = [
   "Milo",
@@ -41,7 +41,7 @@ function randomCatName(): string {
 }
 
 export function showWelcomeScreen(
-  onStart: (name: string, gender: CatGender) => void,
+  onStart: (name: string, gender: CatGender, color: CatColor) => void,
 ) {
   const name = randomCatName();
   const app = document.getElementById("app")!;
@@ -49,10 +49,33 @@ export function showWelcomeScreen(
     <div class="welcome">
       <div class="welcome-card">
         <div class="welcome-cat-preview">
-          <canvas id="preview-canvas" width="64" height="64"></canvas>
+          <canvas id="preview-canvas" width="84" height="60"></canvas>
         </div>
         <h1>Name Your Cat</h1>
         <form id="name-form">
+          <div class="color-select">
+            <label class="color-option">
+              <input type="radio" name="color" value="orange" checked />
+              <span class="color-chip">
+                <canvas class="color-preview" data-color="orange" width="84" height="84"></canvas>
+                <span class="color-name">Orange</span>
+              </span>
+            </label>
+            <label class="color-option">
+              <input type="radio" name="color" value="white" />
+              <span class="color-chip">
+                <canvas class="color-preview" data-color="white" width="84" height="84"></canvas>
+                <span class="color-name">White</span>
+              </span>
+            </label>
+            <label class="color-option">
+              <input type="radio" name="color" value="black" />
+              <span class="color-chip">
+                <canvas class="color-preview" data-color="black" width="84" height="84"></canvas>
+                <span class="color-name">Black</span>
+              </span>
+            </label>
+          </div>
           <input type="text" id="cat-name" placeholder="Enter cat name..." maxlength="16" autofocus required value="${name}" />
           <div class="gender-select">
             <label class="gender-option">
@@ -74,7 +97,15 @@ export function showWelcomeScreen(
       </div>
     </div>
   `;
+  renderColorPreviews();
   animatePreview();
+
+  // Update main preview when color changes
+  document.querySelectorAll<HTMLInputElement>('input[name="color"]').forEach((radio) => {
+    radio.addEventListener("change", () => {
+      animatePreview();
+    });
+  });
 
   const form = document.getElementById("name-form") as HTMLFormElement;
   form.addEventListener("submit", (e) => {
@@ -85,9 +116,14 @@ export function showWelcomeScreen(
     const gender = (document.querySelector<HTMLInputElement>(
       'input[name="gender"]:checked',
     )?.value || "male") as CatGender;
-    onStart(name, gender);
+    const color = (document.querySelector<HTMLInputElement>(
+      'input[name="color"]:checked',
+    )?.value || "orange") as CatColor;
+    onStart(name, gender, color);
   });
 }
+
+let previewInterval: ReturnType<typeof setInterval> | null = null;
 
 function animatePreview() {
   const canvas = document.getElementById(
@@ -98,11 +134,24 @@ function animatePreview() {
   ctx.imageSmoothingEnabled = false;
   const frames = ANIMATIONS.idle;
   let frame = 0;
+  const getColor = () =>
+    (document.querySelector<HTMLInputElement>('input[name="color"]:checked')?.value || "orange") as CatColor;
   const draw = () => {
-    ctx.clearRect(0, 0, 64, 64);
-    renderFrame(ctx, frames[frame], 0, 0, false);
+    ctx.clearRect(0, 0, 84, 84);
+    renderFrame(ctx, frames[frame], 0, 12, false, getColor());
     frame = (frame + 1) % frames.length;
   };
   draw();
-  setInterval(draw, 500);
+  if (previewInterval) clearInterval(previewInterval);
+  previewInterval = setInterval(draw, 500);
+}
+
+function renderColorPreviews() {
+  document.querySelectorAll<HTMLCanvasElement>(".color-preview").forEach((canvas) => {
+    const color = canvas.dataset.color as CatColor;
+    const ctx = canvas.getContext("2d")!;
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, 84, 84);
+    renderFrame(ctx, ANIMATIONS.idle[0], 0, 12, false, color);
+  });
 }

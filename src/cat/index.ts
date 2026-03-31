@@ -25,5 +25,6 @@ export const SPRITE_WIDTH = sprites.SPRITE_WIDTH;
 export const SPRITE_HEIGHT = sprites.SPRITE_HEIGHT;
 export const renderFrame = sprites.renderFrame;
 export type CatAction = v1Sprites.CatAction;
+export type CatColor = v5Sprites.CatColor;
 
 export const setupCatClickDetection = clickMap[ver];

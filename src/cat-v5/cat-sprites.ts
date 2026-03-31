@@ -4,7 +4,9 @@ import { ANIMATIONS } from "./sprite-data";
 
 export { ANIMATIONS };
 
-const PALETTE: Record<number, string> = {
+export type CatColor = "orange" | "white" | "black";
+
+const PALETTE_ORANGE: Record<number, string> = {
   0: "transparent",
   1: "#000000",   // black outline
   2: "#ef6c00",   // dark orange
@@ -18,6 +20,44 @@ const PALETTE: Record<number, string> = {
   10: "#fbc02d",  // golden yellow
   11: "#ffd700",  // gold
   12: "#ffee58",  // light yellow
+};
+
+const PALETTE_WHITE: Record<number, string> = {
+  0: "transparent",
+  1: "#000000",   // black outline
+  2: "#c8c8d2",   // dark gray (shadow)
+  3: "#f0f0f5",   // white (main fur)
+  4: "#fafafc",   // near-white (highlight)
+  5: "#ffdeb1",   // cream (belly/face)
+  6: "#78787e",   // medium gray (outlines)
+  7: "#64646e",   // darker gray (accent)
+  8: "#e84e40",   // red (mouth/tongue)
+  9: "#f69988",   // pink (inner ear/nose)
+  10: "#fbc02d",  // golden yellow
+  11: "#ffd700",  // gold
+  12: "#ffee58",  // light yellow
+};
+
+const PALETTE_BLACK: Record<number, string> = {
+  0: "transparent",
+  1: "#000000",   // black outline
+  2: "#1e1e23",   // near-black (shadow)
+  3: "#323237",   // dark charcoal (main fur)
+  4: "#46464e",   // lighter charcoal (highlight)
+  5: "#ffdeb1",   // cream (belly/face)
+  6: "#0f0f12",   // very dark (outlines)
+  7: "#141419",   // near-black (accent)
+  8: "#e84e40",   // red (mouth/tongue)
+  9: "#f69988",   // pink (inner ear/nose)
+  10: "#fbc02d",  // golden yellow
+  11: "#ffd700",  // gold
+  12: "#ffee58",  // light yellow
+};
+
+const PALETTES: Record<CatColor, Record<number, string>> = {
+  orange: PALETTE_ORANGE,
+  white: PALETTE_WHITE,
+  black: PALETTE_BLACK,
 };
 
 export type CatAction = "idle" | "walk" | "run" | "sleep" | "eat" | "meow" | "vocab";
@@ -62,17 +102,19 @@ export function renderFrame(
   frame: number[][],
   x: number,
   y: number,
-  flipX: boolean = false
+  flipX: boolean = false,
+  catColor: CatColor = "orange"
 ) {
   const size = PIXEL_SIZE;
   const width = frame[0].length;
+  const palette = PALETTES[catColor];
 
   for (let row = 0; row < frame.length; row++) {
     for (let col = 0; col < width; col++) {
       const colorIndex = frame[row][col];
       if (colorIndex === 0) continue;
 
-      const color = PALETTE[colorIndex];
+      const color = palette[colorIndex];
       if (!color || color === "transparent") continue;
 
       ctx.fillStyle = color;

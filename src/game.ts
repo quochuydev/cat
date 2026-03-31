@@ -7,6 +7,7 @@ import {
   SPRITE_HEIGHT,
   renderFrame,
   type CatAction,
+  type CatColor,
 } from "./cat";
 import meowSound from "./assets/sounds/meow.wav";
 import enWords from "./assets/words/en.json";
@@ -30,6 +31,7 @@ export class CatGame {
   private ctx: CanvasRenderingContext2D;
   private catName: string;
   private gender: CatGender;
+  private color: CatColor;
 
   // Cat position (free roam)
   private x: number = 0;
@@ -69,11 +71,13 @@ export class CatGame {
     gender: CatGender,
     screenWidth: number,
     screenHeight: number,
+    color: CatColor = "orange",
   ) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
     this.catName = catName;
     this.gender = gender;
+    this.color = color;
     this.screenWidth = screenWidth;
     this.screenHeight = screenHeight;
 
@@ -98,12 +102,18 @@ export class CatGame {
   get catGender() {
     return this.gender;
   }
+  get catColor() {
+    return this.color;
+  }
 
   setName(name: string) {
     this.catName = name;
   }
   setGender(gender: CatGender) {
     this.gender = gender;
+  }
+  setColor(color: CatColor) {
+    this.color = color;
   }
 
   start() {
@@ -267,7 +277,7 @@ export class CatGame {
     this.ctx.fill();
 
     // Cat sprite
-    renderFrame(this.ctx, frame, this.x, this.y, this.facingLeft);
+    renderFrame(this.ctx, frame, this.x, this.y, this.facingLeft, this.color);
 
     // Zzz for sleep
     if (this.action === "sleep") {
