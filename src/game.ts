@@ -15,7 +15,6 @@ import {
   renderMeowBubble,
   renderChatBubble,
 } from "./render/bubble-renderer";
-import { renderPomodoroBadge } from "./render/pomodoro-renderer";
 import { listen } from "@tauri-apps/api/event";
 import meowSound from "./assets/sounds/meow.wav";
 import enWords from "./assets/words/en.json";
@@ -300,11 +299,7 @@ export class CatGame {
       renderChatBubble(this.ctx, this.x, this.y, now, this.chatMessage, this.chatExpireTime);
     }
 
-    renderNameTag(this.ctx, this.x, this.y, this.catName, this.gender);
-
-    if (this.pomodoroTimer?.isActive) {
-      renderPomodoroBadge(this.ctx, this.x, this.y, this.pomodoroTimer);
-    }
+    renderNameTag(this.ctx, this.x, this.y, this.catName, this.gender, this.pomodoroTimer);
   }
 
   togglePomodoro(settings?: PomodoroSettings) {
