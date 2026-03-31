@@ -5,11 +5,19 @@ import {
   MOVE_SPEED,
   SPRITE_WIDTH,
   SPRITE_HEIGHT,
-  renderFrame,
   type CatAction,
   type CatColor,
 } from "./cat";
 import { PomodoroTimer, type PomodoroSettings } from "./pomodoro";
+import { renderCatSprite, renderNameTag } from "./render/cat-renderer";
+import {
+  renderSleepZzz,
+  renderMeowBubble,
+  renderChatBubble,
+  renderVocabBubble,
+} from "./render/bubble-renderer";
+import { renderPomodoroBadge } from "./render/pomodoro-renderer";
+import { listen } from "@tauri-apps/api/event";
 import meowSound from "./assets/sounds/meow.wav";
 import enWords from "./assets/words/en.json";
 import viWords from "./assets/words/vi.json";
@@ -63,6 +71,10 @@ export class CatGame {
 
   // Activity toggles (all enabled by default)
   enabledActions: Set<CatAction> = new Set(ALL_ACTIONS);
+
+  // Chat bubble
+  private chatMessage: string = "";
+  private chatExpireTime: number = 0;
 
   // Pomodoro
   pomodoroTimer: PomodoroTimer | null = null;
@@ -121,10 +133,19 @@ export class CatGame {
     this.color = color;
   }
 
+  showChat(message: string, durationMs: number = 5000) {
+    this.chatMessage = message;
+    this.chatExpireTime = performance.now() + durationMs;
+  }
+
   start() {
     this.pickRandomAction();
     this.lastFrameTime = performance.now();
     this.loop(performance.now());
+
+    listen<{ message: string }>("chat-message", (event) => {
+      this.showChat(event.payload.message);
+    });
   }
 
   stop() {
@@ -270,163 +291,28 @@ export class CatGame {
   private render(now: number) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    const frames = ANIMATIONS[this.action];
-    const frame = frames[this.currentFrame];
+    renderCatSprite(this.ctx, this.action, this.currentFrame, this.x, this.y, this.facingLeft, this.color);
 
-    // Shadow
-    this.ctx.fillStyle = "rgba(0,0,0,0.12)";
-    this.ctx.beginPath();
-    this.ctx.ellipse(
-      this.x + SPRITE_WIDTH / 2,
-      this.y + SPRITE_HEIGHT - 2,
-      SPRITE_WIDTH / 2.5,
-      4,
-      0,
-      0,
-      Math.PI * 2,
-    );
-    this.ctx.fill();
-
-    // Cat sprite
-    renderFrame(this.ctx, frame, this.x, this.y, this.facingLeft, this.color);
-
-    // Zzz for sleep
     if (this.action === "sleep") {
-      const zOff = Math.sin(this.zzzPhase) * 3;
-      this.ctx.fillStyle = `rgba(100,150,255,${0.5 + Math.sin(this.zzzPhase * 0.5) * 0.3})`;
-      this.ctx.font = "bold 14px monospace";
-      this.ctx.fillText("z", this.x + SPRITE_WIDTH + 2, this.y + 20 + zOff);
-      this.ctx.font = "bold 18px monospace";
-      this.ctx.fillText(
-        "z",
-        this.x + SPRITE_WIDTH + 10,
-        this.y + 10 + zOff * 0.7,
-      );
-      this.ctx.font = "bold 22px monospace";
-      this.ctx.fillText("Z", this.x + SPRITE_WIDTH + 20, this.y + zOff * 0.5);
+      renderSleepZzz(this.ctx, this.x, this.y, this.zzzPhase);
     }
 
-    // Meow bubble
     if (this.action === "meow") {
-      const bounce = Math.sin(now * 0.01) * 2;
-      this.ctx.font = "bold 13px monospace";
-      this.ctx.fillStyle = "#ff6b9d";
-      this.ctx.fillText(
-        "meow~!",
-        this.x + SPRITE_WIDTH / 2 - 20,
-        this.y - 8 + bounce,
-      );
+      renderMeowBubble(this.ctx, this.x, this.y, now);
     }
 
-    // Vocab bubble
+    if (this.chatMessage && now < this.chatExpireTime) {
+      renderChatBubble(this.ctx, this.x, this.y, now, this.chatMessage, this.chatExpireTime);
+    }
+
     if (this.action === "vocab" && this.vocabEn) {
-      const bounce = Math.sin(now * 0.003) * 1.5;
-      const text = `${this.vocabEn}: ${this.vocabVi}`;
-      this.ctx.font = "12px sans-serif";
-      const textWidth = this.ctx.measureText(text).width;
-
-      const padX = 8;
-      const padY = 5;
-      const bubbleW = textWidth + padX * 2;
-      const bubbleH = 14 + padY * 2;
-      const bx = this.x + SPRITE_WIDTH / 2;
-      const bubbleX = bx - bubbleW / 2;
-      const bubbleY = this.y - bubbleH - 8 + bounce;
-
-      // Bubble background
-      this.ctx.fillStyle = "rgba(255,255,255,0.95)";
-      this.ctx.beginPath();
-      this.ctx.roundRect(bubbleX, bubbleY, bubbleW, bubbleH, 8);
-      this.ctx.fill();
-      this.ctx.strokeStyle = "rgba(0,0,0,0.15)";
-      this.ctx.lineWidth = 1;
-      this.ctx.stroke();
-
-      // Tail triangle
-      this.ctx.fillStyle = "rgba(255,255,255,0.95)";
-      this.ctx.beginPath();
-      this.ctx.moveTo(bx - 5, bubbleY + bubbleH);
-      this.ctx.lineTo(bx, bubbleY + bubbleH + 5);
-      this.ctx.lineTo(bx + 5, bubbleY + bubbleH);
-      this.ctx.fill();
-
-      // Text
-      this.ctx.font = "12px sans-serif";
-      this.ctx.fillStyle = "#000";
-      this.ctx.fillText(text, bubbleX + padX, bubbleY + padY + 11);
+      renderVocabBubble(this.ctx, this.x, this.y, now, this.vocabEn, this.vocabVi);
     }
 
-    // Name tag with gender icon
-    const genderIcon =
-      this.gender === "male"
-        ? "\u2642"
-        : this.gender === "female"
-          ? "\u2640"
-          : "\u26B2";
-    const label = `${this.catName} ${genderIcon}`;
-    this.ctx.font = "bold 11px monospace";
-    const labelWidth = this.ctx.measureText(label).width;
-    const nameX = this.x + SPRITE_WIDTH / 2 - labelWidth / 2;
-    const pillPad = 4;
-    const px = nameX - pillPad - 2;
-    const py = this.y + SPRITE_HEIGHT + 2;
-    const pw = labelWidth + pillPad * 2 + 4;
-    const ph = 16;
-    this.ctx.fillStyle = "rgba(255,255,255,0.85)";
-    this.ctx.beginPath();
-    this.ctx.roundRect(px, py, pw, ph, 6);
-    this.ctx.fill();
-    this.ctx.fillStyle = "#444";
-    this.ctx.fillText(this.catName, nameX, this.y + SPRITE_HEIGHT + 14);
-    const genderColor =
-      this.gender === "male"
-        ? "#4a90d9"
-        : this.gender === "female"
-          ? "#e75480"
-          : "#888";
-    this.ctx.fillStyle = genderColor;
-    this.ctx.fillText(
-      ` ${genderIcon}`,
-      nameX + this.ctx.measureText(this.catName).width,
-      this.y + SPRITE_HEIGHT + 14,
-    );
+    renderNameTag(this.ctx, this.x, this.y, this.catName, this.gender);
 
-    // Pomodoro pill badge (below name tag)
     if (this.pomodoroTimer?.isActive) {
-      const isWork = this.pomodoroTimer.phase === "work";
-      const pillText = this.pomodoroTimer.getTimeString();
-      const pillColor = isWork ? "#f4a83d" : "#10a37f";
-
-      this.ctx.font = "bold 10px monospace";
-      const pillTextW = this.ctx.measureText(pillText).width;
-      const pillPadX = 8;
-      const pillH = 18;
-      const pillW = pillTextW + pillPadX * 2;
-      const pillX = this.x + SPRITE_WIDTH / 2 - pillW / 2;
-      const pillY = this.y + SPRITE_HEIGHT + 20;
-
-      // Progress bar background
-      this.ctx.fillStyle = "rgba(255,255,255,0.9)";
-      this.ctx.beginPath();
-      this.ctx.roundRect(pillX, pillY, pillW, pillH, 9);
-      this.ctx.fill();
-      this.ctx.strokeStyle = pillColor;
-      this.ctx.lineWidth = 1.5;
-      this.ctx.stroke();
-
-      // Progress fill
-      const progress = this.pomodoroTimer.getProgress();
-      this.ctx.save();
-      this.ctx.beginPath();
-      this.ctx.roundRect(pillX, pillY, pillW, pillH, 9);
-      this.ctx.clip();
-      this.ctx.fillStyle = isWork ? "rgba(244,168,61,0.15)" : "rgba(16,163,127,0.15)";
-      this.ctx.fillRect(pillX, pillY, pillW * progress, pillH);
-      this.ctx.restore();
-
-      // Text
-      this.ctx.fillStyle = pillColor;
-      this.ctx.fillText(pillText, pillX + pillPadX, pillY + 13);
+      renderPomodoroBadge(this.ctx, this.x, this.y, this.pomodoroTimer);
     }
   }
 
