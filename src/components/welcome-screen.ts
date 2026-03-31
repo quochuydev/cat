@@ -49,7 +49,7 @@ export function showWelcomeScreen(
     <div class="welcome">
       <div class="welcome-card">
         <div class="welcome-cat-preview">
-          <canvas id="preview-canvas" width="84" height="60"></canvas>
+          <canvas id="preview-canvas" width="84" height="84"></canvas>
         </div>
         <h1>Name Your Cat</h1>
         <form id="name-form">

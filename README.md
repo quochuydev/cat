@@ -14,7 +14,7 @@ Download the latest release for your platform:
 
 ### Demo
 
-<img src="docs/readme.png" alt="Cat" width="400" />
+<img src="docs/readme.gif" alt="Cat Demo" width="480" />
 
 ### Security
 

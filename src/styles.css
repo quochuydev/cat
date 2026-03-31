@@ -40,8 +40,8 @@ html, body {
 
 .welcome-cat-preview canvas {
   image-rendering: pixelated;
-  width: 96px;
-  height: 96px;
+  width: 126px;
+  height: 126px;
   border-radius: 12px;
   background: rgba(255,255,255,0.5);
 }
