@@ -9,6 +9,7 @@ import {
   type CatColor,
 } from "../cat";
 import type { CatGender } from "../game";
+import type { PomodoroTimer } from "../pomodoro";
 
 export function renderCatSprite(
   ctx: CanvasRenderingContext2D,
@@ -46,10 +47,12 @@ export function renderNameTag(
   y: number,
   catName: string,
   gender: CatGender,
+  pomodoroTimer?: PomodoroTimer | null,
 ) {
   const genderIcon =
     gender === "male" ? "\u2642" : gender === "female" ? "\u2640" : "\u26B2";
-  const label = `${catName} ${genderIcon}`;
+  const timerText = pomodoroTimer?.isActive ? ` ${pomodoroTimer.getTimeString()}` : "";
+  const label = `${catName} ${genderIcon}${timerText}`;
   ctx.font = "bold 11px monospace";
   const labelWidth = ctx.measureText(label).width;
   const nameX = x + SPRITE_WIDTH / 2 - labelWidth / 2;
@@ -67,9 +70,19 @@ export function renderNameTag(
   const genderColor =
     gender === "male" ? "#4a90d9" : gender === "female" ? "#e75480" : "#888";
   ctx.fillStyle = genderColor;
+  const genderText = ` ${genderIcon}`;
   ctx.fillText(
-    ` ${genderIcon}`,
+    genderText,
     nameX + ctx.measureText(catName).width,
     y + SPRITE_HEIGHT + 14,
   );
+  if (pomodoroTimer?.isActive) {
+    const isBreak = pomodoroTimer.phase === "break";
+    ctx.fillStyle = isBreak ? "#e53e3e" : "#444";
+    ctx.fillText(
+      timerText,
+      nameX + ctx.measureText(`${catName}${genderText}`).width,
+      y + SPRITE_HEIGHT + 14,
+    );
+  }
 }
