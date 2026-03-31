@@ -14,7 +14,9 @@ Download the latest release for your platform:
 
 ### Demo
 
-<img src="docs/readme.gif" alt="Cat Demo" width="480" />
+| Video | Screenshot |
+|:-----:|:----------:|
+| <video src="https://github.com/quochuydev/cat/raw/main/docs/readme.mov" width="400" autoplay loop muted></video> | <img src="docs/readme.png" alt="Cat" width="400" /> |
 
 ### Security
 
