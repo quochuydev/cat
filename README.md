@@ -4,13 +4,15 @@
 
 Download the latest release for your platform:
 
-| Platform              | Download                                                                                                        | Note                                                                |
-| --------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| macOS (Apple Silicon) | [Cat_0.2.0_aarch64.dmg](https://github.com/quochuydev/cat/releases/latest/download/Cat_0.2.0_aarch64.dmg)       | Run `xattr -cr /Applications/Cat.app && open /Applications/Cat.app` |
-| macOS (Intel)         | [Cat_0.2.0_x64.dmg](https://github.com/quochuydev/cat/releases/latest/download/Cat_0.2.0_x64.dmg)               | Run `xattr -cr /Applications/Cat.app && open /Applications/Cat.app` |
-| Windows               | [Cat_0.2.0_x64-setup.exe](https://github.com/quochuydev/cat/releases/latest/download/Cat_0.2.0_x64-setup.exe)   | Click **More info** → **Run anyway**                                |
-| Linux (deb)           | [cat_0.2.0_amd64.deb](https://github.com/quochuydev/cat/releases/latest/download/cat_0.2.0_amd64.deb)           |                                                                     |
-| Linux (AppImage)      | [cat_0.2.0_amd64.AppImage](https://github.com/quochuydev/cat/releases/latest/download/cat_0.2.0_amd64.AppImage) | Run `chmod +x` before opening                                       |
+Download the latest release for your platform from the [Releases page](https://github.com/quochuydev/cat/releases/latest).
+
+| Platform              | File pattern              | Note                                                                |
+| --------------------- | ------------------------- | ------------------------------------------------------------------- |
+| macOS (Apple Silicon) | `Cat_x.x.x_aarch64.dmg`  | Run `xattr -cr /Applications/Cat.app && open /Applications/Cat.app` |
+| macOS (Intel)         | `Cat_x.x.x_x64.dmg`      | Run `xattr -cr /Applications/Cat.app && open /Applications/Cat.app` |
+| Windows               | `Cat_x.x.x_x64-setup.exe`| Click **More info** → **Run anyway**                                |
+| Linux (deb)           | `cat_x.x.x_amd64.deb`    |                                                                     |
+| Linux (AppImage)      | `cat_x.x.x_amd64.AppImage`| Run `chmod +x` before opening                                      |
 
 ### UI
 
