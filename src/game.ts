@@ -17,6 +17,7 @@ import {
 } from "./render/bubble-renderer";
 import { listen } from "@tauri-apps/api/event";
 import meowSound from "./assets/sounds/meow.wav";
+import breakSound from "../docs/break.wav";
 import enWords from "./assets/words/en.json";
 import viWords from "./assets/words/vi.json";
 
@@ -32,6 +33,7 @@ export const ALL_ACTIONS: CatAction[] = [
 export type CatGender = "male" | "female" | "neutered";
 
 const meowAudio = new Audio(meowSound);
+const breakAudio = new Audio(breakSound);
 
 export class CatGame {
   private canvas: HTMLCanvasElement;
@@ -312,8 +314,8 @@ export class CatGame {
       this.pomodoroTimer.onPhaseChange = (phase) => {
         if (phase === "break") {
           if (this.pomodoroTimer?.settings.soundEnabled !== false) {
-            meowAudio.currentTime = 0;
-            meowAudio.play().catch(() => {});
+            breakAudio.currentTime = 0;
+            breakAudio.play().catch(() => {});
           }
         }
       };
