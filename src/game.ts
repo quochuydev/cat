@@ -15,6 +15,8 @@ import {
   renderMeowBubble,
   renderChatBubble,
 } from "./render/bubble-renderer";
+import { renderPriceBoard } from "./render/price-renderer";
+import { fetchPrices, shouldRefresh, type HourlyPrice } from "./price";
 import { listen } from "@tauri-apps/api/event";
 import meowSound from "./assets/sounds/meow.wav";
 import breakSound from "../docs/break.wav";
@@ -75,6 +77,11 @@ export class CatGame {
   // Pomodoro
   pomodoroTimer: PomodoroTimer | null = null;
   private lastTickTime: number = 0;
+
+  // Price board
+  private priceData: HourlyPrice[] = [];
+  showPriceBoard: boolean = false;
+  private priceCheckTimer: number = 0;
 
   private animationId: number = 0;
 
@@ -142,6 +149,20 @@ export class CatGame {
     listen<{ message: string }>("chat-message", (event) => {
       this.showChat(event.payload.message);
     });
+
+    // Initial price fetch
+    this.refreshPrices();
+  }
+
+  private async refreshPrices() {
+    this.priceData = await fetchPrices();
+  }
+
+  togglePriceBoard() {
+    this.showPriceBoard = !this.showPriceBoard;
+    if (this.showPriceBoard) {
+      this.refreshPrices();
+    }
   }
 
   stop() {
@@ -240,6 +261,15 @@ export class CatGame {
     }
     this.lastTickTime = now;
 
+    // Refresh prices every hour
+    this.priceCheckTimer += 1;
+    if (this.priceCheckTimer >= 3600 && this.showPriceBoard) {
+      this.priceCheckTimer = 0;
+      if (shouldRefresh()) {
+        this.refreshPrices();
+      }
+    }
+
     if (!this.paused) {
       if (now >= this.actionEndTime) {
         this.pickRandomAction();
@@ -299,6 +329,10 @@ export class CatGame {
 
     if (this.chatMessage && now < this.chatExpireTime) {
       renderChatBubble(this.ctx, this.x, this.y, now, this.chatMessage, this.chatExpireTime);
+    }
+
+    if (this.showPriceBoard && this.priceData.length > 0) {
+      renderPriceBoard(this.ctx, this.x, this.y, now, this.priceData);
     }
 
     renderNameTag(this.ctx, this.x, this.y, this.catName, this.gender, this.pomodoroTimer);

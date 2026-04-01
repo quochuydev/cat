@@ -10,11 +10,13 @@ import { getPomodoroSettings, savePomodoroSettings } from "./main";
 import settingsLogo from "./assets/logos/settings.svg";
 import chatgptLogo from "./assets/logos/chatgpt.png";
 import feedLogo from "./assets/logos/feed.svg";
+import socialLogo from "./assets/logos/social.svg";
 import ytmusicLogo from "./assets/logos/ytmusic.png";
 import facebookLogo from "./assets/logos/facebook.png";
 import translateLogo from "./assets/logos/translate.png";
 import vnexpressLogo from "./assets/logos/vnexpress.png";
 import pomodoroLogo from "./assets/logos/pomodoro.svg";
+import priceLogo from "./assets/logos/price.svg";
 
 const MENU_BUTTONS = [
   {
@@ -36,22 +38,16 @@ const MENU_BUTTONS = [
     color: "#10a37f",
   },
   {
-    id: "ytmusic",
-    icon: ytmusicLogo,
-    label: "YT Music",
-    color: "#ff4e45",
+    id: "social",
+    icon: socialLogo,
+    label: "Social",
+    color: "#1877f2",
   },
   {
     id: "feed",
     icon: feedLogo,
     label: "Feed",
     color: "#f4a83d",
-  },
-  {
-    id: "facebook",
-    icon: facebookLogo,
-    label: "Facebook",
-    color: "#1877f2",
   },
   {
     id: "translate",
@@ -65,6 +61,12 @@ const MENU_BUTTONS = [
     label: "VnExpress",
     color: "#b71c1c",
   },
+  {
+    id: "price",
+    icon: priceLogo,
+    label: "Prices",
+    color: "#f7931a",
+  },
 ];
 
 const URL_MAP: Record<string, string> = {
@@ -74,6 +76,11 @@ const URL_MAP: Record<string, string> = {
   translate: "https://translate.google.com",
   vnexpress: "https://vnexpress.net",
 };
+
+const SOCIAL_ITEMS = [
+  { id: "facebook", icon: facebookLogo, label: "Facebook", color: "#1877f2" },
+  { id: "ytmusic", icon: ytmusicLogo, label: "YT Music", color: "#ff4e45" },
+];
 
 export async function toggleMenu() {
   if (state.settingsOpen) {
@@ -128,7 +135,11 @@ function renderMenuButtons() {
     el.innerHTML = `<img class="radial-icon" src="${btn.icon}" alt="${btn.label}" />`;
     el.addEventListener("click", (e) => {
       e.stopPropagation();
-      handleMenuAction(btn.id);
+      if (btn.id === "social") {
+        showSocialSubMenu(el);
+      } else {
+        handleMenuAction(btn.id);
+      }
     });
     menu.appendChild(el);
   });
@@ -177,6 +188,8 @@ export async function closeMenu() {
 
   document.removeEventListener("click", onClickOutside);
 
+  document.querySelector(".social-submenu")?.remove();
+
   const menu = document.getElementById("radial-menu")!;
   menu.className = "radial-menu hidden";
   menu.innerHTML = "";
@@ -194,6 +207,37 @@ export async function closeMenu() {
   await state.win.setIgnoreCursorEvents(true);
 }
 
+function showSocialSubMenu(anchorEl: HTMLButtonElement) {
+  // Remove existing sub-menu if any
+  document.querySelector(".social-submenu")?.remove();
+
+  const rect = anchorEl.getBoundingClientRect();
+  const submenu = document.createElement("div");
+  submenu.className = "social-submenu";
+  submenu.style.left = `${rect.left + rect.width / 2}px`;
+  submenu.style.top = `${rect.top + rect.height / 2}px`;
+
+  SOCIAL_ITEMS.forEach((item, i) => {
+    const btn = document.createElement("button");
+    btn.className = "radial-btn social-sub-btn";
+    btn.style.backgroundColor = item.color;
+    btn.style.animationDelay = `${i * 40}ms`;
+    // Position sub-items to the left and right of the anchor
+    const offsetX = i === 0 ? -36 : 36;
+    btn.style.left = `${offsetX}px`;
+    btn.style.top = "0px";
+    btn.innerHTML = `<img class="radial-icon" src="${item.icon}" alt="${item.label}" />`;
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      handleMenuAction(item.id);
+    });
+    submenu.appendChild(btn);
+  });
+
+  const menu = document.getElementById("radial-menu")!;
+  menu.appendChild(submenu);
+}
+
 async function handleMenuAction(id: string) {
   if (!state.game) return;
   if (id === "settings") {
@@ -204,6 +248,11 @@ async function handleMenuAction(id: string) {
     closeMenu();
     state.game.forceAction("eat");
     state.game.showChat("nom nom~! 🐟");
+    return;
+  }
+  if (id === "price") {
+    state.game.togglePriceBoard();
+    closeMenu();
     return;
   }
   if (id === "pomodoro") {
