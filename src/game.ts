@@ -82,6 +82,7 @@ export class CatGame {
   private priceData: HourlyPrice[] = [];
   showPriceBoard: boolean = false;
   private priceCheckTimer: number = 0;
+  private priceBoardCloseTimer: ReturnType<typeof setTimeout> | null = null;
 
   private animationId: number = 0;
 
@@ -159,9 +160,17 @@ export class CatGame {
   }
 
   togglePriceBoard() {
+    if (this.priceBoardCloseTimer) {
+      clearTimeout(this.priceBoardCloseTimer);
+      this.priceBoardCloseTimer = null;
+    }
     this.showPriceBoard = !this.showPriceBoard;
     if (this.showPriceBoard) {
       this.refreshPrices();
+      this.priceBoardCloseTimer = setTimeout(() => {
+        this.showPriceBoard = false;
+        this.priceBoardCloseTimer = null;
+      }, 15_000);
     }
   }
 

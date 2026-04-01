@@ -6,8 +6,8 @@ export interface HourlyPrice {
   xau: number;
 }
 
-const BTC_URL = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=6";
-const XAU_URL = "https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=1h&limit=6";
+const BTC_URL = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=4";
+const XAU_URL = "https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=1h&limit=4";
 
 let cachedPrices: HourlyPrice[] = [];
 let lastFetchHour = -1;

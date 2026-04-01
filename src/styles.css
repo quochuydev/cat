@@ -348,11 +348,12 @@ html, body {
 }
 
 .social-sub-btn:hover {
-  transform: scale(1.15) !important;
+  transform: none !important;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
 }
 
 .social-sub-btn:active {
-  transform: scale(0.95) !important;
+  transform: none !important;
 }
 
 /* ========== Settings Dialog (full-screen overlay like welcome) ========== */
