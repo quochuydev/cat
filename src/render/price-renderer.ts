@@ -36,7 +36,7 @@ export function renderPriceBoard(
   const by = y - boardH - 14 + bounce;
 
   // Board background
-  ctx.fillStyle = "rgba(30, 30, 42, 0.92)";
+  ctx.fillStyle = "#000000";
   ctx.beginPath();
   ctx.roundRect(bx, by, boardW, boardH, 6);
   ctx.fill();
@@ -46,7 +46,7 @@ export function renderPriceBoard(
 
   // Tail
   const tailX = bx + boardW / 2;
-  ctx.fillStyle = "rgba(30, 30, 42, 0.92)";
+  ctx.fillStyle = "#000000";
   ctx.beginPath();
   ctx.moveTo(tailX - 5, by + boardH);
   ctx.lineTo(tailX, by + boardH + 5);
