@@ -355,7 +355,7 @@ export class CatGame {
     } else {
       this.pomodoroTimer = new PomodoroTimer(settings);
       this.pomodoroTimer.onPhaseChange = (phase) => {
-        if (phase === "break") {
+        if (phase === "break" || phase === "work") {
           if (this.pomodoroTimer?.settings.soundEnabled !== false) {
             breakAudio.currentTime = 0;
             breakAudio.play().catch(() => {});
